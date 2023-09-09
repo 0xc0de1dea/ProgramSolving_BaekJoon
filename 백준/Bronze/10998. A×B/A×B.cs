@@ -1,0 +1,1 @@
+using static System.Console;class M{static void Main(){Write((Read()-48+Read()*0)*(Read()-48));}}
