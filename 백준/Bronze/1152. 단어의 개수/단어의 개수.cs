@@ -1,0 +1,1 @@
+using System;class N{static void Main(){var s=Console.ReadLine().Split();var l=s.Length;if(s[l-1]=="")l--;if(s[0]=="")l--;Console.Write(l);}}
