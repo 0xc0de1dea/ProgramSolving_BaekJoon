@@ -1,0 +1,1 @@
+using static System.Console;class X{static void Main(){var i=ReadLine().Split();int a=int.Parse(i[0]),b=int.Parse(i[1]);var n="\n";Write(a+b+n+(a-b)+n+a*b+n+a/b+n+a%b);}}
