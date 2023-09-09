@@ -1,0 +1,1 @@
+using static System.Console;class M{static void Main(){Write(Read()+Read()-32-Read());}}
