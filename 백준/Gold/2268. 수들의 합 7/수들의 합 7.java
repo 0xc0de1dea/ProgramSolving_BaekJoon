@@ -1,0 +1,119 @@
+//import java.io.FileInputStream;
+
+class SegmentTree {
+    final int SIZE = 1 << 20;
+    long[] tree = new long[SIZE << 1];
+
+    public SegmentTree(){
+
+    }
+
+    public SegmentTree(long[] data){
+        int len = data.length;
+
+        for (int i = 0; i < len; i++){
+            tree[SIZE + i] = data[i];
+        }
+
+        optimization();
+    }
+
+    void optimization(){
+        for (int i = SIZE - 1; i > 0; i--){
+            tree[i] = tree[i << 1] + tree[i << 1 | 1];
+        }
+    }
+
+    public long query(int s, int e){
+        return query(s, e, 1, 0, SIZE - 1);
+    }
+
+    long query(int s, int e, int node, int ns, int ne){
+        if (e < ns || ne < s) return 0;
+        if (s <= ns && ne <= e) return tree[node];
+
+        int m = ns + ne >> 1;
+
+        return query(s, e, node << 1, ns, m) + query(s, e, node << 1 | 1, m + 1, ne);
+    }
+
+    public void update(int idx, int value){
+        idx += SIZE;
+        tree[idx] = value;
+
+        while (idx > 1){
+            idx >>= 1;
+            tree[idx] = tree[idx << 1] + tree[idx << 1 | 1];
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] argu) throws Exception {
+        //System.setIn(new FileInputStream("input.in"));
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+        
+        int n = in.nextInt();
+        int m = in.nextInt();
+
+        SegmentTree segTree = new SegmentTree();
+
+        for (int i = 0; i < m; i++){
+            int a = in.nextInt();
+
+            if ((a & 1) == 0){
+                int b = in.nextInt() - 1;
+                int c = in.nextInt() - 1;
+                sb.append(b <= c ? segTree.query(b, c) : segTree.query(c, b)).append('\n');
+            }
+            else {
+                int b = in.nextInt() - 1;
+                int c = in.nextInt();
+                segTree.update(b, c);
+            }
+        }
+        
+        System.out.print(sb);
+    }
+}
+
+class Reader {
+    final int SIZE = 1 << 13;
+    byte[] buffer = new byte[SIZE];
+    int index, size;
+    
+    int nextInt() throws Exception {
+        int n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);//{ if (size == -1) return -1; }
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    long nextLong() throws Exception {
+        long n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    boolean isNumber(byte c) {
+        return 47 < c && c < 58;
+    }
+
+    byte read() throws Exception {
+        if (index == size) {
+            size = System.in.read(buffer, index = 0, SIZE);
+            if (size < 0) buffer[0] = -1;
+        }
+        return buffer[index++];
+    }
+}
