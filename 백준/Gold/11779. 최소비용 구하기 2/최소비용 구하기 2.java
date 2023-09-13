@@ -20,15 +20,14 @@ class Edge {
 public class Main {
     static ArrayList<Edge>[] edges;
     static int[] dist;
-    static int[] cntVisit;
-    static ArrayList<StringBuilder> tracking = new ArrayList<>();
+    static int[] counting;
+    static int[] tracking;
 
     static void bfs(int start){
         PriorityQueue<Edge> pq = new PriorityQueue<>((o1, o2) -> o1.w - o2.w);
         pq.add(new Edge(start, 0));
         dist[start] = 0;
-        cntVisit[start]++;
-        tracking.get(start).append(start);
+        counting[start]++;
         
         while (!pq.isEmpty()){
             Edge cur = pq.poll();
@@ -39,12 +38,28 @@ public class Main {
 
                 if (newDist < dist[next.v]){
                     dist[next.v] = newDist;
-                    cntVisit[next.v] = cntVisit[cur.v] + 1;
-                    tracking.set(next.v, new StringBuilder().append(tracking.get(cur.v)).append(' ').append(next.v));
+                    counting[next.v] = counting[cur.v] + 1;
+                    tracking[next.v] = cur.v;
                     pq.add(new Edge(next.v, dist[next.v]));
                 }
             }
         }
+    }
+
+    static String tracking(int start){
+        StringBuilder sb = new StringBuilder();
+        int[] stack = new int[1_000];
+        int ptr = -1;
+        stack[++ptr] = start;
+
+        while (tracking[start] != 0){
+            stack[++ptr] = tracking[start];
+            start = tracking[start];
+        }
+
+        while (ptr >= 0) sb.append(stack[ptr--]).append(' ');
+
+        return sb.toString();
     }
 
     public static void main(String[] argu) throws Exception {
@@ -57,13 +72,10 @@ public class Main {
         int m = in.nextInt();
         edges = new ArrayList[n + 1];
         dist = new int[n + 1];
-        cntVisit = new int[n + 1];
+        counting = new int[n + 1];
+        tracking = new int[n + 1];
 
-        for (int i = 0; i <= n; i++){
-            edges[i] = new ArrayList<>();
-            tracking.add(new StringBuilder());
-        }
-
+        for (int i = 0; i <= n; i++) edges[i] = new ArrayList<>();
         for (int i = 0; i < m; i++){
             int u = in.nextInt();
             int v = in.nextInt();
@@ -78,7 +90,7 @@ public class Main {
 
         bfs(s);
 
-        sb.append(dist[e]).append('\n').append(cntVisit[e]).append('\n').append(tracking.get(e));
+        sb.append(dist[e]).append('\n').append(counting[e]).append('\n').append(s == e ? "1 1" : tracking(e));
         
         System.out.print(sb);
     }
