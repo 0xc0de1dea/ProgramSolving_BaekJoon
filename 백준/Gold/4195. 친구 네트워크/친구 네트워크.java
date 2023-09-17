@@ -5,10 +5,7 @@
 
 //import java.io.FileInputStream;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 public class Main {
     static int[] parent, rank, counting;
@@ -37,14 +34,13 @@ public class Main {
 
     public static void main(String[] argu) throws Exception {
         //System.setIn(new FileInputStream("input.in"));
-        //Reader in = new Reader();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        int t = Integer.parseInt(br.readLine());
+        int t = in.nextInt();
 
         while (t-- > 0){
-            int f = Integer.parseInt(br.readLine());
+            int f = in.nextInt();
             HashMap<String, Integer> id = new HashMap<>(f << 1);
             parent = new int[f << 1];
             rank = new int[f << 1];
@@ -58,9 +54,8 @@ public class Main {
             int num = -1;
 
             for (int i = 0; i < f; i++){
-                StringTokenizer st = new StringTokenizer(br.readLine());
-                String a = st.nextToken();
-                String b = st.nextToken();
+                String a = in.nextString();
+                String b = in.nextString();
 
                 if (!id.containsKey(a)) id.put(a, ++num);
                 if (!id.containsKey(b)) id.put(b, ++num);
@@ -79,6 +74,15 @@ class Reader {
     final int SIZE = 1 << 13;
     byte[] buffer = new byte[SIZE];
     int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) <= 32);
+        do sb.appendCodePoint(c);
+        while (isAlphabet(c = read()));
+        return sb.toString();
+    }
 
     char nextChar() throws Exception {
         char ch = ' ';
@@ -129,7 +133,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
