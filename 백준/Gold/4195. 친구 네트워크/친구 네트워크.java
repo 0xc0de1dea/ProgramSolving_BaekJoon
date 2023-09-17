@@ -60,9 +60,12 @@ public class Main {
                 if (!id.containsKey(a)) id.put(a, ++num);
                 if (!id.containsKey(b)) id.put(b, ++num);
 
-                union(id.get(a), id.get(b));
+                int idA = id.get(a);
+                int idB = id.get(b);
 
-                sb.append(counting[find(id.get(b))]).append('\n');
+                union(idA, idB);
+
+                sb.append(counting[find(idB)]).append('\n');
             }
         }
 
