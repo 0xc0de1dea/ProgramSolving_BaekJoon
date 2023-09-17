@@ -38,10 +38,10 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         int t = in.nextInt();
+        HashMap<String, Integer> id = new HashMap<>(200_000);
 
         while (t-- > 0){
             int f = in.nextInt();
-            HashMap<String, Integer> id = new HashMap<>(f << 1);
             parent = new int[f << 1];
             rank = new int[f << 1];
             counting = new int[f << 1];
