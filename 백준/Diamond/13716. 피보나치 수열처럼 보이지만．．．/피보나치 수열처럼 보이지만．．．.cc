@@ -13,106 +13,95 @@ const ll mod = 1000000007;
 
 ll add(ll x, ll y, ll mod){
     x %= mod; y %= mod;
-
     return (x >= mod - y ? x - (mod - y) : x + y);
 }
 
 ll mul(ll x, ll y, ll mod){
     ll ret = 0; x %= mod; y %= mod;
-
-    while (y){
+    while (y > 0){
         if (y & 1) ret = add(ret, x, mod);
         x = add(x, x, mod); y >>= 1;
     }
-
     return ret;
 }
 
-ll ipow(ll x, ll y){
-	ll ret = 1;
-
-	while (y){
-		if(y & 1) ret = ret * x % mod;
-		x = x * x % mod; y >>= 1;
+ll ipow(ll x, ll p){
+	ll ret = 1, piv = x;
+	while(p){
+		if(p & 1) ret = ret * piv % mod;
+		piv = piv * piv % mod;
+		p >>= 1;
 	}
-
 	return ret;
 }
 vector<int> berlekamp_massey(vector<int> x){
 	vector<int> ls, cur;
 	int lf, ld;
-
-	for(int i = 0; i < x.size(); i++){
+	for(int i=0; i<x.size(); i++){
 		ll t = 0;
-
-		for(int j = 0; j < cur.size(); j++) t = (t + 1ll * x[i - j - 1] * cur[j]) % mod;
+		for(int j=0; j<cur.size(); j++){
+			t = (t + 1ll * x[i-j-1] * cur[j]) % mod;
+		}
 		if((t - x[i]) % mod == 0) continue;
 		if(cur.empty()){
-			cur.resize(i + 1);
+			cur.resize(i+1);
 			lf = i;
 			ld = (t - x[i]) % mod;
 			continue;
 		}
-
 		ll k = -(x[i] - t) * ipow(ld, mod - 2) % mod;
-		vector<int> c(i - lf - 1);
+		vector<int> c(i-lf-1);
 		c.push_back(k);
-
 		for(auto &j : ls) c.push_back(-j * k % mod);
 		if(c.size() < cur.size()) c.resize(cur.size());
-		for(int j = 0; j < cur.size(); j++) c[j] = (c[j] + cur[j]) % mod;
-		if(i - lf + (int)ls.size() >= (int)cur.size()) tie(ls, lf, ld) = make_tuple(cur, i, (t - x[i]) % mod);
-
+		for(int j=0; j<cur.size(); j++){
+			c[j] = (c[j] + cur[j]) % mod;
+		}
+		if(i-lf+(int)ls.size()>=(int)cur.size()){
+			tie(ls, lf, ld) = make_tuple(cur, i, (t - x[i]) % mod);
+		}
 		cur = c;
 	}
 	for(auto &i : cur) i = (i % mod + mod) % mod;
-
 	return cur;
 }
 int get_nth(vector<int> rec, vector<int> dp, ll n){
 	int m = rec.size();
-	vector<int> s(m), t(m); s[0] = 1;
-
+	vector<int> s(m), t(m);
+	s[0] = 1;
 	if(m != 1) t[1] = 1;
 	else t[0] = rec[0];
-	
 	auto mul = [&rec](vector<int> v, vector<int> w){
 		int m = v.size();
 		vector<int> t(2 * m);
-
-		for(int j = 0; j < m; j++){
-			for(int k = 0; k < m; k++){
-				t[j + k] += 1ll * v[j] * w[k] % mod;
-				if(t[j + k] >= mod) t[j + k] -= mod;
+		for(int j=0; j<m; j++){
+			for(int k=0; k<m; k++){
+				t[j+k] += 1ll * v[j] * w[k] % mod;
+				if(t[j+k] >= mod) t[j+k] -= mod;
 			}
 		}
-		for(int j = 2 * m - 1; j >= m; j--){
-			for(int k = 1; k <= m; k++){
-				t[j - k] += 1ll * t[j] * rec[k - 1] % mod;
-				if(t[j - k] >= mod) t[j - k] -= mod;
+		for(int j=2*m-1; j>=m; j--){
+			for(int k=1; k<=m; k++){
+				t[j-k] += 1ll * t[j] * rec[k-1] % mod;
+				if(t[j-k] >= mod) t[j-k] -= mod;
 			}
 		}
 		t.resize(m);
-
 		return t;
 	};
-
 	while(n){
 		if(n & 1) s = mul(s, t);
-		t = mul(t, t); n >>= 1;
+		t = mul(t, t);
+		n >>= 1;
 	}
-
 	ll ret = 0;
 	for(int i=0; i<m; i++) ret += 1ll * s[i] * dp[i] % mod;
-
 	return ret % mod;
 }
 int guess_nth_term(vector<int> x, ll n){
 	if(n < x.size()) return x[n];
-
 	vector<int> v = berlekamp_massey(x);
 	if(v.empty()) return 0;
-
 	return get_nth(v, x, n);
 }
 
@@ -150,7 +139,7 @@ main() {
     int k; cin >> k;
     vector<int> f;
     
-    for (ll i = 1; i < 1 << 8; i++){
+    for (ll i = 1; i < 1000; i++){
 		matrix fibo_matrix = {{ 1, 1 }, { 1, 0 }};
         fibo_matrix = matrix_2x2_pow(fibo_matrix, i);
 		ll ik = ipow(i, k);
