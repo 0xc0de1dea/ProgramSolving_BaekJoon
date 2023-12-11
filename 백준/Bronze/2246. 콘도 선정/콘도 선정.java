@@ -3,6 +3,8 @@
  * Email : 0xc0de1dea@gmail.com
  */
 
+import java.util.Arrays;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
@@ -17,18 +19,19 @@ public class Main {
             condos[i][1] = in.nextInt();
         }
         
+        Arrays.sort(condos, (o1, o2) -> {
+            if (o1[0] == o2[0]) return o1[1] - o2[1];
+            else return o1[0] - o2[0];
+        });
+
         int candidates = 0;
+        int min = 1234567890;
 
         for (int i = 0; i < n; i++){
-            boolean flag = true;
-            for (int j = 0; j < n; j++){
-                if (i == j) continue;
-                if ((condos[i][1] > condos[j][1] && condos[i][0] >= condos[j][0]) || (condos[i][0] > condos[j][0] && condos[i][1] >= condos[j][1])){
-                    flag = false;
-                    break;
-                }
+            if (min > condos[i][1]){
+                min = condos[i][1];
+                candidates++;
             }
-            if (flag) candidates++;
         }
 
         System.out.print(candidates);
