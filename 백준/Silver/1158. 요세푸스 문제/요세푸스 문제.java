@@ -1,5 +1,6 @@
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Written by 0xc0de1dea
@@ -12,31 +13,19 @@ public class Main {
         Reader in = new Reader();
         int n = in.nextInt();
         int k = in.nextInt();
-        Queue<Integer> queue = new LinkedList();
+        List<Integer> list = IntStream.range(1, n + 1).boxed().collect(Collectors.toList());
 
-        for (int i = 1; i <= n; i++){
-            queue.add(i);
-        }
-
-        int[] res = new int[n];
-        int idx = 0;
-
-        while (!queue.isEmpty()){
-            for (int i = 0; i < k - 1; i++){
-                queue.add(queue.poll());
-            }
-
-            res[idx++] = queue.poll();
-        }
-
+        int ptr = k - 1;
         StringBuilder sb = new StringBuilder();
         sb.append('<');
 
         for (int i = 0; i < n - 1; i++){
-            sb.append(res[i]).append(", ");
+            sb.append(list.remove(ptr)).append(", ");
+            ptr += (k - 1);
+            ptr %= list.size();
         }
 
-        sb.append(res[n - 1]).append('>');
+        sb.append(list.remove(0)).append('>');
         System.out.print(sb);
     }
 }
