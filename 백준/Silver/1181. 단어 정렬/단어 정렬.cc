@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
+ 
 vector<string> res;
-
+ 
 void merge(vector<string>& str, int start, int mid, int end) {
     int i = start, j = mid+1, k = start;
     while (i <= mid && j <= end) {
@@ -39,7 +39,7 @@ void merge(vector<string>& str, int start, int mid, int end) {
     }
     for (i = start; i <= end; i++) { str[i] = res[i]; }
 }
-
+ 
 void mergeSort(vector<string>& str, int start, int end) {
     if (start < end) {
         int mid = (start+end)/2;
@@ -48,7 +48,7 @@ void mergeSort(vector<string>& str, int start, int end) {
         merge(str, start, mid, end);
     }
 }
-
+ 
 int main() {
     cin.tie(NULL);
 	cin.sync_with_stdio(false);
