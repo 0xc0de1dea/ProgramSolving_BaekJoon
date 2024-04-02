@@ -8,40 +8,18 @@ import java.util.Queue;
  */
 
 public class Main {
-    public static int bfs(int n, int k){
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(n);
+    public static int dp(int n, int k){
+        int[] dp = new int[k + 1];
 
-        int[] isVisited = new int[100_001];
-        isVisited[n] = 1;
-        
-        while (!queue.isEmpty()){
-            int cur = queue.poll();
-
-            if (cur == k){
-                break;
-            }
-            
-            for (int i = 0; i < 3; i++){
-                int nxt = cur;
-
-                if (i == 0) nxt++;
-                else if (i == 1) nxt--;
-                else if (i == 2) nxt *= 2;
-
-                if (0 <= nxt && nxt <= 100_000){
-                    if (i < 2 && (isVisited[nxt] > isVisited[cur] + 1 || isVisited[nxt] == 0)){
-                        queue.add(nxt);
-                        isVisited[nxt] = isVisited[cur] + 1;
-                    } else if (i == 2 && (isVisited[nxt] > isVisited[cur] || isVisited[nxt] == 0)){
-                        queue.add(nxt);
-                        isVisited[nxt] = isVisited[cur];
-                    }
-                }
-            }
+        for (int i = 0; i <= n; i++){
+            dp[i] = n - i;
         }
 
-        return isVisited[k] - 1;
+        for (int i = n + 1; i <= k; i++){
+            dp[i] = Math.min(dp[i - 1] + 1, i % 2 == 0 ? dp[i / 2] : Math.min(dp[i / 2] + 1, dp[i / 2 + 1] + 1));
+        }
+
+        return dp[k];
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,7 +28,11 @@ public class Main {
         int n = in.nextInt();
         int k = in.nextInt();
 
-        System.out.print(bfs(n, k));
+        if (n >= k){
+            System.out.print(n - k);
+        } else {
+            System.out.print(dp(n, k));
+        }
     }
 }
 
