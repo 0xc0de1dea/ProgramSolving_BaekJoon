@@ -1,65 +1,87 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.PriorityQueue;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.util.ArrayList;
-
-class Edge {
-    int u, v;
+class Edge implements Comparable<Edge> {
+    int a;
+    int b;
     int cost;
 
-    public Edge(int u, int v, int cost){
-        this.u = u;
-        this.v = v;
+    public Edge(int a, int b, int cost){
+        this.a = a;
+        this.b = b;
         this.cost = cost;
+    }
+
+    @Override
+    public int compareTo(Edge o){
+        return this.cost - o.cost;
     }
 }
 
 public class Main {
-    static int v, e;
-    static long[] cost;
-    static ArrayList<Edge> edges;
+    static int n;
+    static int m;
+    static Edge[] edges;
+    static long[] dist;
+    static final int INF = 123_456_789;
 
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
-        Reader in = new Reader();
-        StringBuilder sb = new StringBuilder();
-        final long INF = (long)1e10;
+    public static boolean bellmanford(int start){
+        dist[start] = 0;
+        boolean isUpdate = false;
 
-        v = in.nextInt();
-        e = in.nextInt();
-        cost = new long[v + 1];
-        edges = new ArrayList<>();
-        
-        for (int i = 2; i <= v; i++) cost[i] = INF;
-        for (int i = 0; i < e; i++){
-            int a = in.nextInt();
-            int b = in.nextInt();
-            int c = in.nextInt();
-            edges.add(new Edge(a, b, c));
-        }
+        for (int i = 0; i < n; i++){
+            isUpdate = false;
 
-        boolean flag = true;
+            for (int j = 0; j < m; j++){
+                Edge cur = edges[j];
 
-        for (int i = 1; i <= v; i++){
-            for (int j = 0; j < e; j++){
-                Edge cur = edges.get(j);
-                if (cost[cur.u] != INF && cost[cur.v] > cost[cur.u] + cur.cost){
-                    cost[cur.v] = cost[cur.u] + cur.cost;
-                    if (i == v) flag = false;
+                if (dist[cur.a] == INF) continue;
+                
+                if (dist[cur.b] > dist[cur.a] + cur.cost){
+                    dist[cur.b] = dist[cur.a] + cur.cost;
+                    isUpdate = true;
                 }
             }
+
+            if (!isUpdate) break;
+
         }
 
-        if (flag){
-            for (int i = 2; i <= v; i++){
-                sb.append(cost[i] == INF ? -1 : cost[i]).append('\n');
+        if (isUpdate) return true;
+        else return false;
+    }
+
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+        n = in.nextInt();
+        m = in.nextInt();
+        edges = new Edge[m];
+        
+        for (int i = 0; i < m; i++){
+            edges[i] = new Edge(in.nextInt(), in.nextInt(), in.nextInt());
+        }
+
+        dist = new long[n + 1];
+        
+        for (int i = 1; i <= n; i++){
+            dist[i] = INF;
+        }
+
+        if (bellmanford(1)){
+            sb.append(-1);
+        } else {
+            for (int i = 2; i <= n; i++){
+                sb.append(dist[i] == INF ? -1 : dist[i]).append('\n');
             }
         }
-        else sb.append(-1);
 
         System.out.print(sb);
     }
@@ -70,20 +92,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -105,7 +133,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -119,7 +147,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
