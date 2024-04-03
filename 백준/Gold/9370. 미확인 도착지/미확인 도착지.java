@@ -1,88 +1,119 @@
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.PriorityQueue;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
+class Node implements Comparable<Node> {
+    int x;
+    int cost;
 
-import java.util.ArrayList;
-import java.util.PriorityQueue;
+    public Node(int x, int cost){
+        this.x = x;
+        this.cost = cost;
+    }
 
-class Edge {
-    int v, w;
-
-    public Edge(int v, int w){
-        this.v = v;
-        this.w = w;
+    @Override
+    public int compareTo(Node o){
+        return this.cost - o.cost;
     }
 }
 
 public class Main {
-    static ArrayList<Edge>[] edges;
-    static int[] dist;
-    static final int INF = 123456789;
+    static int n;
+    static ArrayList<ArrayList<Node>> nodes;
+    static int[][] dist;
+    static final int INF = 123_456_789;
 
-    static int dijkstra(int n, int start, int end){
-        PriorityQueue<Edge> pq = new PriorityQueue<>((o1, o2) -> o1.w - o2.w);
-        pq.add(new Edge(start, 0));
-        dist = new int[n + 1];
-
-        for (int i = 1; i <= n; i++) dist[i] = INF;
-        dist[start] = 0;
+    public static void dijkstra(int start, int pathType){
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.add(new Node(start, 0));
+        dist[pathType][start] = 0;
 
         while (!pq.isEmpty()){
-            Edge cur = pq.poll();
+            Node cur = pq.poll();
 
-            if (cur.w > dist[cur.v]) continue;
-            for (Edge next : edges[cur.v]){
-                int newW = dist[cur.v] + next.w;
+            if (dist[pathType][cur.x] < cur.cost){
+                continue;
+            }
 
-                if (newW < dist[next.v]){
-                    dist[next.v] = newW;
-                    pq.add(new Edge(next.v, dist[next.v]));
+            for (int i = 0; i < nodes.get(cur.x).size(); i++){
+                Node nxt = nodes.get(cur.x).get(i);
+
+                if (dist[pathType][nxt.x] > cur.cost + nxt.cost){
+                    dist[pathType][nxt.x] = cur.cost + nxt.cost;
+                    pq.add(new Node(nxt.x, dist[pathType][nxt.x]));
                 }
             }
         }
-
-        return dist[end];
     }
 
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
-        StringBuilder sb = new StringBuilder();
-
         int T = in.nextInt();
+        StringBuilder sb = new StringBuilder();
 
         while (T-- > 0){
             int n = in.nextInt();
             int m = in.nextInt();
             int t = in.nextInt();
+
             int s = in.nextInt();
             int g = in.nextInt();
             int h = in.nextInt();
-            edges = new ArrayList[n + 1];
-            PriorityQueue<Integer> candidates = new PriorityQueue<>();
-            
-            for (int i = 1; i <= n; i++) edges[i] = new ArrayList<>();
-            for (int i = 0; i < m; i++){
-                int u = in.nextInt();
-                int v = in.nextInt();
-                int w = in.nextInt();
-                edges[u].add(new Edge(v, w));
-                edges[v].add(new Edge(u, w));
+
+            nodes = new ArrayList<>();
+
+            for (int i = 0; i <= n; i++){
+                nodes.add(new ArrayList<>());
             }
+
+            for (int i = 0; i < m; i++){
+                int a = in.nextInt();
+                int b = in.nextInt();
+                int d = in.nextInt();
+
+                nodes.get(a).add(new Node(b, d));
+                nodes.get(b).add(new Node(a, d));
+            }
+
+            ArrayList<Integer> candidates = new ArrayList<>();
+            int[] dest = new int[t];
+
             for (int i = 0; i < t; i++){
-                int x = in.nextInt();
-                int s2x = dijkstra(n, s, x);
-                
-                if (dijkstra(n, s, g) + dijkstra(n, g, h) + dijkstra(n, h, x) == s2x ||
-                    dijkstra(n, s, h) + dijkstra(n, h, g) + dijkstra(n, g, x) == s2x){
-                    candidates.add(x);
+                dest[i] = in.nextInt();
+            }
+
+            dist = new int[3][n + 1];
+
+            for (int i = 0; i < 3; i++){
+                for (int j = 1; j <= n; j++){
+                    dist[i][j] = INF;
                 }
             }
-            while (!candidates.isEmpty()) sb.append(candidates.poll()).append(' ');
 
+            dijkstra(s, 0);
+            dijkstra(g, 1);
+            dijkstra(h, 2);
+
+            for (int i = 0; i < t; i++){
+                if ((dist[0][dest[i]] == dist[0][g] + dist[1][h] + dist[2][dest[i]]) 
+                || (dist[0][dest[i]] == dist[0][h] + dist[2][g] + dist[1][dest[i]])){
+                    candidates.add(dest[i]);
+                }
+            }
+
+            Collections.sort(candidates);
+            
+            for (int item : candidates){
+                sb.append(item).append(' ');
+            }
             sb.append('\n');
         }
 
@@ -95,20 +126,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -130,7 +167,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -144,7 +181,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
