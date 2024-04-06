@@ -3,49 +3,56 @@
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
 public class Main {
-    static int[] parent, rank;
+    static int[] parent;
+    static int[] rank;
 
-    static int find(int node){
-        if (parent[node] == node) return node;
-        return parent[node] = find(parent[node]);
+    public static int find(int a){
+        if (a == parent[a]) return a;
+
+        return parent[a] = find(parent[a]);
     }
 
-    static void union(int x, int y){
-        x = find(x); y = find(y);
+    public static void union(int a, int b){
+        a = find(a);
+        b = find(b);
 
-        if (x != y){
-            if (rank[x] > rank[y]) parent[y] = x;
-            else parent[x] = y;
+        if (a != b){
+            if (rank[a] < rank[b]){
+                parent[a] = b;
+            } else {
+                parent[b] = a;
+            }
 
-            if (rank[x] == rank[y]) rank[y]++;
+            if (rank[a] == rank[b]){
+                rank[a]++;
+            }
         }
     }
 
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-
+        
         int n = in.nextInt();
         int m = in.nextInt();
         parent = new int[n + 1];
         rank = new int[n + 1];
 
-        for (int i = 1; i <= n; i++) parent[i] = i;
-        while (m-- > 0){
-            int type = in.nextInt();
+        for (int i = 0; i <= n; i++){
+            parent[i] = i;
+        }
+
+        for (int i = 0; i < m; i++){
+            int order = in.nextInt();
             int a = in.nextInt();
             int b = in.nextInt();
 
-            if (type == 0){
+            if (order == 0){
                 union(a, b);
-            }
-            else {
-                if (find(a) == find(b)) sb.append("YES").append('\n');
-                else sb.append("NO").append('\n');
+            } else if (order == 1){
+                sb.append(find(a) == find(b) ? "YES" : "NO").append('\n');
             }
         }
 
@@ -58,20 +65,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -93,7 +106,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -107,7 +120,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
