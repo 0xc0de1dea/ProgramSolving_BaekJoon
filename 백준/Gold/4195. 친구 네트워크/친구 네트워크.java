@@ -1,71 +1,74 @@
+import java.util.HashMap;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.util.HashMap;
-
 public class Main {
-    static int[] parent, rank, counting;
+    static int[] parent;
+    static int[] rank;
+    static int[] counting;
 
-    static int find(int node){
-        if (parent[node] == node) return node;
-        return parent[node] = find(parent[node]);
+    public static int find(int a){
+        if (a == parent[a]) return a;
+
+        return parent[a] = find(parent[a]);
     }
 
-    static void union(int x, int y){
-        x = find(x); y = find(y);
+    public static void union(int a, int b){
+        a = find(a);
+        b = find(b);
 
-        if (x != y){
-            if (rank[x] > rank[y]){
-                parent[y] = x;
-                counting[x] += counting[y];
-            }
-            else {
-                parent[x] = y;
-                counting[y] += counting[x];
+        if (a != b){
+            if (rank[a] < rank[b]){
+                parent[a] = b;
+                counting[b] += counting[a];
+            } else {
+                parent[b] = a;
+                counting[a] += counting[b];
             }
 
-            if (rank[x] == rank[y]) rank[y]++;
+            if (rank[a] == rank[b]){
+                rank[a]++;
+            }
         }
     }
 
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-
+        
         int t = in.nextInt();
-        HashMap<String, Integer> id = new HashMap<>(200_000);
 
         while (t-- > 0){
             int f = in.nextInt();
-            parent = new int[f << 1];
-            rank = new int[f << 1];
-            counting = new int[f << 1];
-
-            for (int i = 0; i < f << 1; i++){
+            parent = new int[f << 1 | 1];
+            rank = new int[f << 1 | 1];
+            counting = new int[f << 1 | 1];
+    
+            for (int i = 1; i <= f << 1; i++){
                 parent[i] = i;
                 counting[i] = 1;
             }
-
-            int num = -1;
-
+    
+            int idx = 1;
+            HashMap<String, Integer> id = new HashMap<>(f << 1);
+    
             for (int i = 0; i < f; i++){
                 String a = in.nextString();
                 String b = in.nextString();
-
-                if (!id.containsKey(a)) id.put(a, ++num);
-                if (!id.containsKey(b)) id.put(b, ++num);
+                
+                if (!id.containsKey(a)) id.put(a, idx++);
+                if (!id.containsKey(b)) id.put(b, idx++);
 
                 int idA = id.get(a);
                 int idB = id.get(b);
 
                 union(idA, idB);
 
-                sb.append(counting[find(idB)]).append('\n');
+                sb.append(counting[find(idA)]).append('\n');
             }
         }
 
@@ -81,26 +84,23 @@ class Reader {
     String nextString() throws Exception {
         StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while (isAlphabet(c = read()));
+        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
-        char ch = ' ';
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -122,7 +122,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
