@@ -3,55 +3,58 @@
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-class Edge {
-    int u, v;
-    int cost;
-
-    public Edge(int u, int v, int cost){
-        this.u = u;
-        this.v = v;
-        this.cost = cost;
-    }
-}
-
 public class Main {
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
-        Reader in = new Reader();
-        StringBuilder sb = new StringBuilder();
-        final long INF = (long)1e10;
+    static int[][] dist;
+    static final int INF = 123_456_789;
 
-        int n = in.nextInt();
-        int m = in.nextInt();
-        long[][] minCost = new long[n + 1][n + 1];
-        
-        for (int i = 1; i <= n; i++){
-            for (int j = 1; j <= n; j++){
-                minCost[i][j] = INF;
-            }
-        }
-        for (int i = 0; i < m; i++){
-            int u = in.nextInt();
-            int v = in.nextInt();
-            int w = in.nextInt();
-            if (minCost[u][v] > w) minCost[u][v] = w;
-        }
-        for (int i = 1; i <= n; i++){
-            for (int j = 1; j <= n; j++){
-                for (int k = 1; k <= n; k++){
-                    if (j == i || k == i) continue;
-                    if (minCost[j][i] + minCost[i][k] < minCost[j][k]) minCost[j][k] = minCost[j][i] + minCost[i][k];
+    public static void floydwarshall(int v){
+        for (int k = 1; k <= v; k++){
+            for (int i = 1; i <= v; i++){
+                for (int j = 1; j <= v; j++){
+                    if (dist[i][j] > dist[i][k] + dist[k][j]){
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
                 }
             }
         }
+    }
 
-        long min = INF;
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+        int v = in.nextInt();
+        int e = in.nextInt();
+        dist = new int[v + 1][v + 1];
 
-        for (int i = 1; i <= n; i++) min = Math.min(min, minCost[i][i]);
+        for (int i = 1; i < v + 1; i++){
+            for (int j = 1; j < v + 1; j++){
+                if (i != j){
+                    dist[i][j] = INF;
+                }
+            }
+        }
+        
+        for (int i = 0; i < e; i++){
+            int a = in.nextInt();
+            int b = in.nextInt();
+            int c = in.nextInt();
+            dist[a][b] = c;
+        }
 
-        System.out.print(min == INF ? -1 : min);
+        floydwarshall(v);
+
+        int min = INF;
+
+        for (int i = 1; i <= v; i++){
+            for (int j = 1; j <= v; j++){
+                if (i == j) continue;
+
+                min = Math.min(min, dist[i][j] + dist[j][i]);
+            }
+        }
+
+        System.out.print(min >= INF ? -1 : min);
     }
 }
 
@@ -60,20 +63,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -95,7 +104,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -109,7 +118,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
