@@ -1,63 +1,64 @@
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.util.PriorityQueue;
-
-class Edge {
-    int u, v, cost;
-
-    public Edge(int u, int v, int cost){
-        this.u = u;
-        this.v = v;
-        this.cost = cost;
-    }
-}
-
 public class Main {
-    static int[] parents;
+    static int[] parent;
     static int[] rank;
-    static PriorityQueue<Edge> edges;
 
-    static int find(int node){
-        if (node == parents[node]) return node;
-        return parents[node] = find(parents[node]);
+    public static int find(int a){
+        if (a == parent[a]) return a;
+
+        return parent[a] = find(parent[a]);
     }
 
-    static void union(int x, int y){
-        x = find(x);
-        y = find(y);
+    public static void union(int a, int b){
+        a = find(a);
+        b = find(b);
 
-        if (x != y){
-            if (rank[x] > rank[y]) parents[y] = x;
-            else parents[x] = y;
-            
-            if (rank[x] == rank[y]) rank[y]++;
+        if (a != b){
+            if (rank[a] < rank[b]){
+                parent[a] = b;
+            } else {
+                parent[b] = a;
+            }
+
+            if (rank[a] == rank[b]){
+                rank[a]++;
+            }
         }
     }
 
-    static int kruskal(int n){
-        int ret = 0;
-        int rem = n - 1;
+    public static int kruskal(int[][] edges, int n, int m){
+        int cost = 0;
+        parent = new int[n + 1];
+        rank = new int[n + 1];
+        Arrays.sort(edges, (x, y) -> x[2] - y[2]);
 
-        while (rem > 0){
-            Edge cur = edges.poll();
+        for (int i = 1; i <= n; i++){
+            parent[i] = i;
+        }
 
-            if (find(cur.u) != find(cur.v)){
-                union(cur.u, cur.v);
-                ret += cur.cost;
-                rem--;
+        int cnt = 0;
+
+        for (int i = 0; i < m; i++){
+            if (find(edges[i][0]) != find(edges[i][1])){
+                union(edges[i][0], edges[i][1]);
+                cost += edges[i][2];
+                cnt++;
+
+                if (cnt == n - 1) break;
             }
         }
 
-        return ret;
+        return cost;
     }
 
-    public static void main(String[] argu) throws Exception {
-        //System.setIn(new FileInputStream("input.in"));
+    public static void main(String[] args) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
@@ -67,23 +68,22 @@ public class Main {
 
             if (n == 0 && m == 0) break;
 
-            parents = new int[n + 1];
-            rank = new int[n + 1];
-            edges = new PriorityQueue<>((o1, o2) -> o1.cost - o2.cost);
-            int tot = 0;
-
-            for (int i = 1; i <= n; i++) parents[i] = i;
+            int[][] edges = new int[m][3];
+            int totCost = 0;
+    
             for (int i = 0; i < m; i++){
-                int x = in.nextInt() + 1;
-                int y = in.nextInt() + 1;
-                int z = in.nextInt();
-                edges.add(new Edge(x, y, z));
-                tot += z;
+                edges[i][0] = in.nextInt();
+                edges[i][1] = in.nextInt();
+                edges[i][2] = in.nextInt();
+                totCost += edges[i][2];
             }
 
-            sb.append(tot - kruskal(n)).append('\n');
+            int minCost = kruskal(edges, n, m);
+
+            sb.append(totCost - minCost).append('\n');
         }
 
+        
         System.out.print(sb);
     }
 }
@@ -96,26 +96,23 @@ class Reader {
     String nextString() throws Exception {
         StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while (isAlphabet(c = read()));
+        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
-        char ch = ' ';
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -137,7 +134,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
