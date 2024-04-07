@@ -34,6 +34,7 @@ public class Main {
 
     public static int kruskal(int[][] edges, int v, int e){
         int weight = 0;
+        int cnt = 0;
         Arrays.sort(edges, (x, y) -> x[2] - y[2]);
         parent = new int[v + 1];
         rank = new int[v + 1];
@@ -46,6 +47,11 @@ public class Main {
             if (find(edges[i][0]) != find(edges[i][1])){
                 union(edges[i][0], edges[i][1]);
                 weight += edges[i][2];
+                cnt++;
+
+                if (cnt == v - 1){
+                    break;
+                }
             }
         }
 
