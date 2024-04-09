@@ -1,35 +1,9 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
 public class Main {
-    static ArrayList<Integer> coins = new ArrayList<>();
-    static int[] dp;
-
-    public static int recursion(int n){
-        if (n == 0){
-            return 1;
-        } else if (n < 0){
-            return 0;
-        }
-
-        if (dp[n] != 0){
-            return dp[n];
-        }
-
-        int sum = 0;
-
-        for (int i = 0; i < coins.size(); i++){
-            sum += recursion(n - coins.get(i));
-        }
-
-        return dp[n] = sum;
-    }
-
     public static void main(String[] args) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
@@ -37,16 +11,14 @@ public class Main {
 
         int n = in.nextInt();
         int k = in.nextInt();
-        dp = new int[k + 1];
+        int[] dp = new int[k + 1];
         dp[0] = 1;
 
         for (int i = 0; i < n; i++){
             int coin = in.nextInt();
 
-            for (int j = 1; j < k + 1; j++){
-                if (j - coin >= 0){
-                    dp[j] += dp[j - coin];
-                }
+            for (int j = coin; j < k + 1; j++){
+                dp[j] += dp[j - coin];
             }
         }
 
