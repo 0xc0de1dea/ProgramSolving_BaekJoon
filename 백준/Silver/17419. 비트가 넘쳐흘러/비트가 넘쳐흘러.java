@@ -1,6 +1,3 @@
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
@@ -11,24 +8,14 @@ public class Main {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         int N = in.nextInt();
-        String k = in.nextString();
-        int K = 0;
-
-        int digit = 1;
-
-        for (int i = k.length() - 1; i >= 0; i--){
-            if (k.charAt(i) == '1'){
-                K |= digit;
-            }
-
-            digit <<= 1;
-        }
-
+        String K = in.nextString();
+        
         int cnt = 0;
 
-        while (K > 0){
-            K = K - (K & ((~K) + 1));
-            cnt++;
+        for (int i = 0; i < N; i++){
+            if (K.charAt(i) == '1'){
+                cnt++;
+            }
         }
 
         System.out.print(cnt);
