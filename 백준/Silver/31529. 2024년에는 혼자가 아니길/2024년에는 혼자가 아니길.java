@@ -13,10 +13,10 @@ public class Main {
         int x = in.nextInt();
         int y = in.nextInt();
 
-        if (2 * x - y < 0){
+        if (2 * x - y < 0 || x > y){
             System.out.print(-1);
         } else {
-            System.out.println((2 * x - y) / 4 * 2024);
+            System.out.println((int)((2 * x - y) / 4.0 * 2024));
         }
     }
 }
