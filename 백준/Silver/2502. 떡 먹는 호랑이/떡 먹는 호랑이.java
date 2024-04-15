@@ -10,26 +10,26 @@ public class Main {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         
-        int b = in.nextInt();
-        int a = in.nextInt();
-        int[] dp = new int[b + 1];
+        int d = in.nextInt();
+        int k = in.nextInt();
+        int[] A = new int[d + 1];
+        int[] B = new int[d + 1];
+        A[1] = 1;
+        A[2] = 0;
+        B[1] = 0;
+        B[2] = 1;
 
-        for (int i = 1; i < a; i++){
-            dp[b - 2] = i;
-            dp[b - 1] = a - i;
-            boolean flag = true;
+        for (int i = 3; i <= d; i++){
+            A[i] = A[i - 1] + A[i - 2];
+            B[i] = B[i - 1] + B[i - 2];
+        }
 
-            for (int j = b - 3; j >= 1; j--){
-                dp[j] = dp[j + 2] - dp[j + 1];
+        for (int i = 1; i < k; i++){
+            int upExp = k - A[d] * i;
 
-                if (dp[j] > dp[j + 1]){
-                    flag = false;
-                }
-            }
-
-            if (flag){
-                System.out.println(dp[1]);
-                System.out.println(dp[2]);
+            if (upExp % B[d] == 0){
+                System.out.println(i);
+                System.out.println(upExp / B[d]);
                 break;
             }
         }
