@@ -8,22 +8,20 @@ import java.util.Queue;
 
 public class Main {
     static final int MAX = 4_000_000;
+    static int[] isVisited = new int[MAX + 1];
     
-    public static int bfs(int start, int k){
+    public static void bfs(int start){
         Queue<Integer> queue = new LinkedList<>();
         queue.add(start);
-        int[] isVisited = new int[MAX + 1];
         isVisited[start] = 1;
-
-        int res = 0;
 
         while (!queue.isEmpty()){
             int cur = queue.poll();
 
-            if (cur == k){
-                res = isVisited[cur];
-                break;
-            }
+            // if (cur == k){
+            //     res = isVisited[cur];
+            //     break;
+            // }
 
             if (cur - 1 > 0){
                 if (isVisited[cur - 1] == 0 || isVisited[cur] + 1 < isVisited[cur - 1]){
@@ -39,8 +37,6 @@ public class Main {
                 }
             }
         }
-
-        return res - 1;
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,10 +45,11 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         
         int t = in.nextInt();
+        bfs(1);
 
         while (t-- > 0){
             int k = in.nextInt();
-            int cnt = bfs(1, k);
+            int cnt = isVisited[k] - 1;
             sb.append(cnt == -1 ? "Wrong proof!" : cnt).append('\n');
         }
 
