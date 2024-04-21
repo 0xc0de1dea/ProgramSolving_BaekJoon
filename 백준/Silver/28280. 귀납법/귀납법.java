@@ -25,17 +25,17 @@ public class Main {
                 break;
             }
 
-            if (cur * 2 <= MAX){
-                if (isVisited[cur << 1] == 0 || isVisited[cur] + 1 < isVisited[cur << 1]){
-                    isVisited[cur << 1] = isVisited[cur] + 1;
-                    queue.add(cur << 1);
-                }
-            }
-
             if (cur - 1 > 0){
                 if (isVisited[cur - 1] == 0 || isVisited[cur] + 1 < isVisited[cur - 1]){
                     isVisited[cur - 1] = isVisited[cur] + 1;
                     queue.add(cur - 1);
+                }
+            }
+
+            if (cur * 2 <= MAX){
+                if (isVisited[cur << 1] == 0 || isVisited[cur] + 1 < isVisited[cur << 1]){
+                    isVisited[cur << 1] = isVisited[cur] + 1;
+                    queue.add(cur << 1);
                 }
             }
         }
