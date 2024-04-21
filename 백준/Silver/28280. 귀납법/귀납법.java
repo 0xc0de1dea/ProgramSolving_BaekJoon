@@ -22,6 +22,7 @@ public class Main {
 
             if (cur == k){
                 res = isVisited[cur];
+                break;
             }
 
             if (cur * 2 <= MAX){
