@@ -4,17 +4,16 @@
  */
 
 public class Main {
-    public static long pow(long a, long b){
-        long res = 1;
+    static int a, b;
+    static int cnt = 0;
 
-        while (b > 0){
-            if ((b & 1) == 1) res *= a;
-
-            a *= a;
-            b >>= 1;
-        }
-
-        return res;
+    public static void dfs(long n){
+        if (n > b) return;
+        
+        if (n >= a) cnt++;
+        
+        dfs(n * 10 + 7);
+        dfs(n * 10 + 4);
     }
 
     public static void main(String[] args) throws Exception {
@@ -22,34 +21,12 @@ public class Main {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
         
-        int a = in.nextInt();
-        int b = in.nextInt();
-        int num = 0;
-        int cnt = 0;
+        a = in.nextInt();
+        b = in.nextInt();
+        
+        dfs(0);
 
-        while (num <= b){
-            int digit = (int)Math.log10(num);
-
-            while (digit >= 0){
-                long rem = num / pow(10, digit) % 10;
-
-                if (rem != 4 && rem != 7) break;
-
-                digit--;
-            }
-
-            if (digit < 0){
-                if (a <= num && num <= b){
-                    cnt++;
-                }
-
-                num++;
-            } else {
-                num += pow(10, digit);
-            }
-        }
-
-        System.out.print(cnt);
+        System.out.println(cnt);
     }
 }
 
