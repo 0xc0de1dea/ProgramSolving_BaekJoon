@@ -7,7 +7,6 @@
     final int SIZE = 1 << 23;
     final int MAX = 1234567890;
     int[] minTree = new int[SIZE << 1];
-    int[] maxTree = new int[SIZE << 1];
 
     public SegmentTree(){
 
@@ -18,7 +17,6 @@
 
         for (int i = 0; i < len; i++){
             minTree[SIZE + i] = data[i];
-            maxTree[SIZE + i] = data[i];
         }
 
         for (int i = len; i < SIZE; i++){
@@ -31,7 +29,6 @@
     void optimization(){
         for (int i = SIZE - 1; i > 0; i--){
             minTree[i] = Math.min(minTree[i << 1], minTree[i << 1 | 1]);
-            maxTree[i] = Math.max(maxTree[i << 1], maxTree[i << 1 | 1]);
         }
     }
 
