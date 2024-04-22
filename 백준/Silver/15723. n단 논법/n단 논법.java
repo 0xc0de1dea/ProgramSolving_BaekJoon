@@ -1,41 +1,17 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
 public class Main {
-    static ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
-
-    public static boolean bfs(int start, int target){
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add(start);
-        boolean[] isVisited = new boolean[26];
-        isVisited[start] = true;
-
-        boolean check = false;
-
-        while (!queue.isEmpty()){
-            int cur = queue.poll();
-
-            if (cur == target){
-                check = true;
-                break;
-            }
-
-            for (int next : edges.get(cur)){
-                if (!isVisited[next]){
-                    isVisited[next] = true;
-                    queue.add(next);
+    public static void floydwarshall(int[][] map){
+        for (int k = 0; k < 26; k++){
+            for (int i = 0; i < 26; i++){
+                for (int j = 0; j < 26; j++){
+                    map[i][j] = Math.min(map[i][j], map[i][k] + map[k][j]);
                 }
             }
         }
-
-        return check;
     }
 
     public static void main(String[] args) throws Exception {
@@ -44,17 +20,25 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         
         int n = in.nextInt();
+        int[][] map = new int[26][26];
+        final int INF = 1_000_000_000;
 
         for (int i = 0; i < 26; i++){
-            edges.add(new ArrayList<>());
+            for (int j = 0; j < 26; j++){
+                if (i != j){
+                    map[i][j] = INF;
+                }
+            }
         }
         
         while (n-- > 0){
             String[] logic = in.nextString().split(" ");
             int a = logic[0].charAt(0) - 'a';
             int b = logic[2].charAt(0) - 'a';
-            edges.get(a).add(b);
+            map[a][b] = 1;
         }
+
+        floydwarshall(map);
 
         int m = in.nextInt();
 
@@ -63,7 +47,7 @@ public class Main {
             int a = logic[0].charAt(0) - 'a';
             int b = logic[2].charAt(0) - 'a';
 
-            boolean check = bfs(a, b);
+            boolean check = map[a][b] != INF ? true : false;
             sb.append(check ? "T" : "F").append('\n');
         }
 
