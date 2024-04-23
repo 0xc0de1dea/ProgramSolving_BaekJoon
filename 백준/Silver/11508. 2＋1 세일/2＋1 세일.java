@@ -39,27 +39,24 @@ public class Main {
         
         int n = in.nextInt();
         int[] goods = new int[n];
+        int totCost = 0;
 
         for (int i = 0; i < n; i++){
             goods[i] = in.nextInt();
+            totCost += goods[i];
         }
 
         Arrays.sort(goods);
 
         int minCost = 0;
-        int capacity = 0;
-        
-        for (int i = n - 1; i >= 0; i--){
-            capacity++;
-            minCost += goods[i];
+        int ptr = n - 3;
 
-            if (capacity == 3){
-                minCost -= goods[i];
-                capacity = 0;
-            }
+        while (ptr >= 0){
+            totCost -= goods[ptr];
+            ptr -= 3;
         }
 
-        System.out.print(minCost);
+        System.out.print(totCost);
     }
 }
 
