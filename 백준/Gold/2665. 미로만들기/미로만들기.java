@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -17,10 +19,58 @@ class Point {
     }
 }
 
+class Node {
+    int u, v, w;
+
+    public Node(int u, int v, int w){
+        this.u = u;
+        this.v = v;
+        this.w = w;
+    }
+}
+
 public class Main {
     static int n;
     static int[] dx = { 0, 1, 0, -1 };
     static int[] dy = { 1, 0, -1, 0 };
+
+    public static int[][] dijkstra(int[][] map, int sx, int sy){
+        PriorityQueue<Node> pq = new PriorityQueue<>((x, y) -> x.w - y.w);
+        pq.add(new Node(sx, sy, 0));
+
+        int[][] cost = new int[n + 2][n + 2];
+
+        for (int i = 1; i <= n; i++){
+            for (int j = 1; j <= n; j++){
+                cost[i][j] = Integer.MAX_VALUE;
+            }
+        }
+
+        cost[sx][sy] = 0;
+
+        while (!pq.isEmpty()){
+            Node cur = pq.poll();
+
+            if (cost[cur.u][cur.v] < cur.w) continue;
+
+            for (int i = 0; i < 4; i++){
+                int nx = cur.u + dx[i];
+                int ny = cur.v + dy[i];
+                int nw = cur.w;
+
+                if (map[nx][ny] >= 0){
+                    if (map[nx][ny] == 0) nw++;
+
+                    if (nw < cost[nx][ny]){
+                        cost[nx][ny] = nw;
+                        pq.add(new Node(nx, ny, nw));
+                    }
+                }
+            }
+        }
+
+        return cost;
+    }
 
     public static int[][] bfs(int[][] map, int sx, int sy){
         Queue<Point> queue = new LinkedList<>();
@@ -80,7 +130,8 @@ public class Main {
             map[i][0] = map[i][n + 1] = map[0][i] = map[n + 1][i] = -1;
         }
 
-        int[][] cost = bfs(map, 1, 1);
+        //int[][] cost = bfs(map, 1, 1);
+        int[][] cost = dijkstra(map, 1, 1);
         System.out.print(cost[n][n]);
     }
 }
