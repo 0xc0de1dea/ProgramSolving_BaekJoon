@@ -1,70 +1,75 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-import java.util.ArrayList;
+class Node {
+    int to, cost;
 
-class Edge {
-    int v, dist;
-
-    public Edge(int v, int dist){
-        this.v = v;
-        this.dist = dist;
+    public Node(int to, int cost){
+        this.to = to;
+        this.cost = cost;
     }
 }
 
 public class Main {
-    static int n;
-    static ArrayList<Edge>[] edges;
+    static ArrayList<ArrayList<Node>> edges = new ArrayList<>();
     static boolean[] isVisited;
-    static int diameterV, diameterDist;
+    static int v2;
+    static int diameter;
 
-    static void dfs(int curNode, int totDist){
-        isVisited[curNode] = true;
+    public static void dfs(int cur, int dist){
+        isVisited[cur] = true;
         boolean flag = true;
 
-        for (Edge edge : edges[curNode]){
-            if (!isVisited[edge.v]){
-                dfs(edge.v, totDist + edge.dist);
+        for (Node nxt : edges.get(cur)){
+            if (!isVisited[nxt.to]){
+                dfs(nxt.to, dist + nxt.cost);
                 flag = false;
             }
         }
+
         if (flag){
-            if (diameterDist < totDist){
-                diameterV = curNode;
-                diameterDist = totDist;
+            if (diameter < dist){
+                v2 = cur;
+                diameter = dist;
             }
         }
     }
 
     public static void main(String[] argu) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
+        //System.setIn(new FileInputStream("input.in"));
         Reader in = new Reader();
-        StringBuilder sb = new StringBuilder();
 
-        n = in.nextInt();
-        edges = new ArrayList[n + 1];
+        int v = in.nextInt();
+        isVisited = new boolean[v + 1];
 
-        for (int i = 1; i <= n; i++) edges[i] = new ArrayList<>();
-        for (int i = 1; i <= n; i++){
-            int u = in.nextInt();
-            int v;
-            int dist;
-            
-            while ((v = in.nextInt()) != -1){
-                dist = in.nextInt();
-                edges[u].add(new Edge(v, dist));
-                edges[v].add(new Edge(u, dist));
+        for (int i = 0; i <= v; i++){
+            edges.add(new ArrayList<>());
+        }
+
+        for (int i = 1; i <= v; i++){
+            int a = in.nextInt();
+
+            while (true){
+                int b = in.nextInt();
+
+                if (b == -1) break;
+
+                int c = in.nextInt();
+
+                edges.get(a).add(new Node(b, c));
             }
         }
 
-        isVisited = new boolean[n + 1];
         dfs(1, 0);
-        isVisited = new boolean[n + 1];
-        dfs(diameterV, 0);
-
-        System.out.print(diameterDist);
+        isVisited = new boolean[v + 1];
+        dfs(v2, 0);
+        System.out.println(diameter);
     }
 }
 
@@ -76,15 +81,15 @@ class Reader {
     String nextString() throws Exception {
         StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while ((c = read()) > 32);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
@@ -92,7 +97,7 @@ class Reader {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -114,7 +119,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
