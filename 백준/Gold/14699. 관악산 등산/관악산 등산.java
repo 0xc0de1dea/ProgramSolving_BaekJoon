@@ -23,7 +23,7 @@ public class Main {
                 flag = true;
             }
         }
-
+        
         dp[cur] = max;
 
         if (!flag) {
