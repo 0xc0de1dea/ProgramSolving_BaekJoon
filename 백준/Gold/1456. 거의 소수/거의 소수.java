@@ -6,7 +6,6 @@ import java.util.ArrayList;
  */
 
 public class Main {
-    static final long MMAX = (long)(1e14);
     static final int MAX = 10_000_000;
     static boolean[] isPrime = new boolean[MAX + 1];
     static ArrayList<Long> prime = new ArrayList<>();
@@ -40,18 +39,14 @@ public class Main {
 
         for (int i = 0; i < prime.size(); i++){
             long num = prime.get(i);
-            int exp = 2;
+            long pow = prime.get(i);
             
-            while (true){
-                long pow = (long)Math.pow(num, exp);
-
-                if (a <= pow && pow <= b){
+            while ((double)num <= (double)b / pow){
+                if ((double)num >= (double)a / pow){
                     cnt++;
-                } else if (pow > b){
-                    break;
                 }
 
-                exp++;
+                pow *= num;
             }
         }
 
