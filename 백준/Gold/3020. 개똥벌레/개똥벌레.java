@@ -47,13 +47,8 @@ public class Main {
 
             if (min > conflict){
                 min = conflict;
-            }
-        }
-
-        for (int i = 1; i <= h; i++){
-            int conflict = lowerbound(0, n >> 1, i, dn) + lowerbound(0, n >> 1, h - i + 1, up);
-
-            if (min == conflict){
+                cnt = 1;
+            } else if (min == conflict){
                 cnt++;
             }
         }
