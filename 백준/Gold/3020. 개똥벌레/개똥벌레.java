@@ -28,22 +28,27 @@ public class Main {
         int n = in.nextInt();
         int h = in.nextInt();
 
-        int[] dn = new int[n >> 1];
-        int[] up = new int[n >> 1];
+        int[] dn = new int[h + 1];
+        int[] up = new int[h + 2];
 
         for (int i = 0; i < n >> 1; i++){
-            dn[i] = in.nextInt();
-            up[i] = in.nextInt();
+            dn[in.nextInt()]++;
+            up[h - in.nextInt() + 1]++;
         }
 
-        Arrays.sort(up);
-        Arrays.sort(dn);
+        for (int i = 1; i <= h; i++){
+            dn[i] += dn[i - 1];
+        }
+
+        for (int i = h - 1; i >= 0; i--){
+            up[i] += up[i + 1];
+        }
 
         int min = n;
         int cnt = 0;
 
         for (int i = 1; i <= h; i++){
-            int conflict = lowerbound(0, n >> 1, i, dn) + lowerbound(0, n >> 1, h - i + 1, up);
+            int conflict = (dn[h] - dn[i - 1]) + (up[1] - up[i + 1]);
 
             if (min > conflict){
                 min = conflict;
