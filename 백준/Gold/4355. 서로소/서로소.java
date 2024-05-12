@@ -6,12 +6,9 @@
 public class Main {
     public static long phi(long n){
         long res = n;
-        boolean isPrime = true;
 
         for (int i = 2; i * i <= n; i++){
             if (n % i == 0){
-                isPrime = false;
-
                 while (n % i == 0){
                     n /= i;
                 }
@@ -19,9 +16,7 @@ public class Main {
                 res -= res / i;
             }
         }
-
-        if (isPrime && n != 1) return res - 1;
-
+        
         if (n > 1) res -= res / n;
 
         return res;
