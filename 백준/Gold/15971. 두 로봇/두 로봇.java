@@ -17,30 +17,21 @@ class Edge {
 
 public class Main {
     static ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
-    static ArrayList<Integer> list = new ArrayList<>();
+    static int[] maxsum = new int[2];
     static boolean[] isVisited;
 
-    public static void dfs(int cur, int end, ArrayList<Integer> candidate){
+    public static void dfs(int cur, int end, int max, int sum){
         isVisited[cur] = true;
 
         if (cur == end){
-            for (int item : candidate){
-                list.add(item);
-            }
-
+            maxsum[0] = max;
+            maxsum[1] = sum;
             return;
         }
 
         for (Edge nxt : edges.get(cur)){
             if (!isVisited[nxt.to]){
-                ArrayList<Integer> clone = new ArrayList<>();
-
-                for (int item : candidate){
-                    clone.add(item);
-                }
-
-                clone.add(nxt.dist);
-                dfs(nxt.to, end, clone);
+                dfs(nxt.to, end, Math.max(max, nxt.dist), sum + nxt.dist);
             }
         }
     }
@@ -68,20 +59,9 @@ public class Main {
             edges.get(y).add(new Edge(x, dist));
         }
 
-        dfs(a, b, new ArrayList<>());
+        dfs(a, b, 0, 0);
 
-        int max = 0;
-        int sum = 0;
-
-        for (int item : list){
-            sum += item;
-
-            if (max < item){
-                max = item;
-            }
-        }
-
-        System.out.print(sum - max);
+        System.out.print(maxsum[1] - maxsum[0]);
     }
 }
 
