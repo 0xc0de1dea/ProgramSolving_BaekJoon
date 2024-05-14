@@ -33,21 +33,14 @@ public class Main {
 
         char[][] board = new char[ROW_MAX][COL_MAX];
 
-        for (int i = 0; i < ROW_MAX; i++){
-            for (int j = 0; j < COL_MAX; j++){
-                board[i][j] = ' ';
-            }
-        }
-
         printStar(board, n, 0, COL_MAX >> 1);
 
         for (int i = 0; i < ROW_MAX; i++){
             for (int j = 0; j < COL_MAX; j++){
                 sb.append(board[i][j] != '*' ? ' ' : '*');
             }
-            if (i < ROW_MAX - 1){
-                sb.append('\n');
-            }
+
+            sb.append('\n');
         }
 
         System.out.print(sb);
