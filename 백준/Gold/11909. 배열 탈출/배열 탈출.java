@@ -1,0 +1,132 @@
+/**
+ * Written by 0xc0de1dea
+ * Email : 0xc0de1dea@gmail.com
+ */
+
+public class Main {
+    static int n;
+    static int[][] map;
+    static int[][] dp;
+
+    public static int dfs(int sx, int sy){
+        if (dp[sx][sy] >= 0){
+            return dp[sx][sy];
+        }
+
+        if (sx == n && sy == n){
+            return dp[sx][sy] = 0;
+        }
+
+        int min = 123456789;
+
+        if (sx + 1 <= n){
+            int cost = map[sx + 1][sy] - map[sx][sy] + 1;
+
+            if (cost < 0) cost = 0;
+
+            min = Math.min(min, dfs(sx + 1, sy) + cost);
+        }
+
+        if (sy + 1 <= n){
+            int cost = map[sx][sy + 1] - map[sx][sy] + 1;
+
+            if (cost < 0) cost = 0;
+
+            min = Math.min(min, dfs(sx, sy + 1) + cost);
+        }
+
+        return dp[sx][sy] = min;
+    }
+
+    public static void main(String[] argu) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
+        n = in.nextInt();
+        map = new int[n + 1][n + 1];
+        dp = new int[n + 1][n + 1];
+
+        for (int i = 1; i <= n; i++){
+            for (int j = 1; j <= n; j++){
+                map[i][j] = in.nextInt();
+                dp[i][j] = -1;
+            }
+        }
+
+        int min = dfs(1, 1);
+        System.out.print(min);
+    }
+}
+
+class Reader {
+    final int SIZE = 1 << 13;
+    byte[] buffer = new byte[SIZE];
+    int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
+    }
+    
+    int nextInt() throws Exception {
+        int n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    long nextLong() throws Exception {
+        long n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    double nextDouble() throws Exception {
+        double n = 0, div = 1;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
+        if (c == 45) { c = read(); isMinus = true; }
+        else if (c == 46) { c = read(); }
+        do n = (n * 10) + (c & 15);
+        while (isNumber(c = read()));
+        if (c == 46) { while (isNumber(c = read())){ n += (c - 48) / (div *= 10); }}
+        return isMinus ? -n : n;
+    }
+
+    boolean isNumber(byte c) {
+        return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
+    }
+
+    byte read() throws Exception {
+        if (index == size) {
+            size = System.in.read(buffer, index = 0, SIZE);
+            if (size < 0) buffer[0] = -1;
+        }
+        return buffer[index++];
+    }
+}
