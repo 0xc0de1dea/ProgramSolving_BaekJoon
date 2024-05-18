@@ -59,7 +59,7 @@ public class Main {
                 int idx = 0;
                 if (isTruthKnown) {
                     while (idx < n && arr[i][idx] != 0) {
-                        union(0, arr[i][idx]);
+                        union(mainTruth, arr[i][idx]);
                         idx++;
                     }
                 } else {
