@@ -39,7 +39,7 @@ public class Main {
     static long f(long x, long m){
         if (x == 1 || m == 1) return 1;
         long phi = phi(m);
-        return pow(x, f(x, phi) + (x >= phi ? phi : 0), m);
+        return pow(x, f(x, phi), m);
     }
 
     public static void main(String[] args) throws Exception {
