@@ -16,7 +16,6 @@ public class Main {
 
         parent = new int[n + 1];
         rank = new int[n + 1];
-        rank[0] = 123456789;
         for (int i = 1; i <= n; i++) {
             parent[i] = i;
         }
@@ -33,12 +32,13 @@ public class Main {
         } else {
             truthMan[0] = Integer.parseInt(stk.nextToken());
             mainTruth = truthMan[0];
-            union(0, truthMan[0]);
+            rank[mainTruth] = 123456789;
+            union(mainTruth, truthMan[0]);
         }
 
         for (int i = 1; i < truthNum; i++) {
             truthMan[i] = Integer.parseInt(stk.nextToken());
-            union(0, truthMan[i]);
+            union(mainTruth, truthMan[i]);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -51,7 +51,7 @@ public class Main {
 
                 for (int j = 0; j < partyNum; j++) {
                     arr[i][j] = Integer.parseInt(stk.nextToken());
-                    if (parent[arr[i][j]] == 0) {
+                    if (parent[arr[i][j]] == mainTruth) {
                         isTruthKnown = true;
                     }
                 }
@@ -89,7 +89,7 @@ public class Main {
 
                 for (int j : i) {
                     if (j == 0) break;
-                    if (find(j) == 0) {
+                    if (find(j) == mainTruth) {
                         check = false;
                         break;
                     }
