@@ -1,88 +1,126 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
     static int[] parent;
+    static int[][] arr;
     static int[] rank;
 
-    public static int find_Root(int node){
-        if (node == parent[node]) return node;
-
-        return parent[node] = find_Root(parent[node]);
-    }
-
-    public static void union_Root(int node1, int node2){
-        node1 = find_Root(node1);
-        node2 = find_Root(node2);
-
-        if (node1 != node2){
-            if (rank[node1] < rank[node2]) parent[node1] = node2;
-            else parent[node2] = node1;
-
-            if (rank[node1] == rank[node2]){
-                rank[node1]++;
-            }
-        }
-    }
-
-    public static void main(String[] argu) throws IOException {
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
+        StringTokenizer stk = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(stk.nextToken());
+        int m = Integer.parseInt(stk.nextToken());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
         parent = new int[n + 1];
         rank = new int[n + 1];
-        rank[0] = Integer.MAX_VALUE;
-
-        for (int i = 1; i <= n; i++){
+        rank[0] = 123456789;
+        for (int i = 1; i <= n; i++) {
             parent[i] = i;
         }
+        arr = new int[m][n];
 
-        st = new StringTokenizer(br.readLine());
-        int knownCnt = Integer.parseInt(st.nextToken());
-        
-        for (int i = 0; i < knownCnt; i++){
-            union_Root(0, Integer.parseInt(st.nextToken()));
+        stk = new StringTokenizer(br.readLine());
+        int truthNum = Integer.parseInt(stk.nextToken());
+        boolean isTruth = true;
+        int[] truthMan = new int[truthNum];
+        int mainTruth = 0;
+
+        if (truthNum == 0) {
+            isTruth = false;
+        } else {
+            truthMan[0] = Integer.parseInt(stk.nextToken());
+            mainTruth = truthMan[0];
+            union(0, truthMan[0]);
         }
 
-        ArrayList<Integer>[] guests = new ArrayList[m];
+        for (int i = 1; i < truthNum; i++) {
+            truthMan[i] = Integer.parseInt(stk.nextToken());
+            union(0, truthMan[i]);
+        }
 
-        for (int i = 0; i < m; i++){
-            guests[i] = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        int answer = 0;
+        if (isTruth) {
+            for (int i = 0; i < m; i++) {
+                stk = new StringTokenizer(br.readLine());
+                int partyNum = Integer.parseInt(stk.nextToken());
+                boolean isTruthKnown = false;
 
-            st = new StringTokenizer(br.readLine());
-            int num = Integer.parseInt(st.nextToken());
-            int target = Integer.parseInt(st.nextToken());
-            guests[i].add(num);
-            guests[i].add(target);
+                for (int j = 0; j < partyNum; j++) {
+                    arr[i][j] = Integer.parseInt(stk.nextToken());
+                    if (parent[arr[i][j]] == 0) {
+                        isTruthKnown = true;
+                    }
+                }
 
-            for (int j = 2; j <= num; j++){
-                guests[i].add(Integer.parseInt(st.nextToken()));
-                union_Root(target, guests[i].get(j));
+                int idx = 0;
+                if (isTruthKnown) {
+                    while (idx < n && arr[i][idx] != 0) {
+                        union(0, arr[i][idx]);
+                        idx++;
+                    }
+                } else {
+                    while (idx < n && arr[i][idx + 1] != 0) {
+                        union(arr[i][0], arr[i][idx + 1]);
+                        idx++;
+                    }
+                }
             }
+        } else {
+            for (int i = 0; i < m; i++) {
+                stk = new StringTokenizer(br.readLine());
+                int partyNum = Integer.parseInt(stk.nextToken());
+                for (int j = 0; j < partyNum; j++) {
+                    arr[i][j] = Integer.parseInt(stk.nextToken());
+                }
+            }
+            answer = m;
+            sb.append(answer);
         }
 
-        int cnt = 0;
-
-            for (int i = 0; i < m; i++){
+        if (isTruth) {
+            answer = m;
+            
+            for (int[] i : arr) {
                 boolean check = true;
-                int num = guests[i].get(0);
 
-                for (int j = 1; j <= num; j++){
-                    if (find_Root(guests[i].get(j)) == 0){
+                for (int j : i) {
+                    if (j == 0) break;
+                    if (find(j) == 0) {
                         check = false;
                         break;
                     }
                 }
 
-                cnt += check ? 1 : 0;
-            }
+                if (!check) {
+                    answer--;
+                }
 
-        System.out.println(cnt);
+            }
+            sb.append(answer);
+        }
+
+        System.out.println(sb);
+    }
+
+    private static void union(int a, int b) {
+        a = find(a);
+        b = find(b);
+
+        if (a != b) {
+            if (rank[a] >= rank[b]) parent[b] = a;
+            else parent[a] = b;
+
+            if (rank[a] == rank[b]) rank[a]++;
+        }
+    }
+
+    private static int find(int x) {
+        if (parent[x] == x) return x;
+
+        return parent[x] = find(parent[x]);
     }
 }
