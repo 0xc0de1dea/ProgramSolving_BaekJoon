@@ -67,9 +67,8 @@ public class Main {
             }
         }
 
-        int cnt = m;
+        int cnt = 0;
 
-        if (knownCnt != 0) {
             for (int i = 0; i < m; i++){
                 boolean check = true;
                 int num = guests[i].get(0);
@@ -81,9 +80,8 @@ public class Main {
                     }
                 }
 
-                cnt -= check ? 0 : 1;
+                cnt += check ? 1 : 0;
             }
-        }
 
         System.out.println(cnt);
     }
