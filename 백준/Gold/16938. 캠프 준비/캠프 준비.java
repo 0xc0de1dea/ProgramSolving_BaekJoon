@@ -10,10 +10,9 @@ public class Main {
     static int n;
     static long l, r;
     static long x;
-    static ArrayList<Long> list = new ArrayList<>();
     static int cnt;
 
-    public static void backtracking(long[] difficulty, int idx, long sum, int choice){
+    public static void backtracking(long[] difficulty, int idx, long min, long max, long sum, int choice){
         if (sum > r){
             return;
         }
@@ -23,9 +22,6 @@ public class Main {
                 return;
             }
 
-            long min = list.stream().mapToLong(x -> x).min().getAsLong();
-            long max = list.stream().mapToLong(x -> x).max().getAsLong();
-
             if (max - min >= x){
                 cnt++;
             }
@@ -33,10 +29,8 @@ public class Main {
             return;
         }
 
-        backtracking(difficulty, idx + 1, sum, choice);
-        list.add(difficulty[idx]);
-        backtracking(difficulty, idx + 1, sum + difficulty[idx], choice + 1);
-        list.remove(list.size() - 1);
+        backtracking(difficulty, idx + 1, min, max, sum, choice);
+        backtracking(difficulty, idx + 1, Math.min(min, difficulty[idx]), Math.max(max, difficulty[idx]), sum + difficulty[idx], choice + 1);
     }
 
     public static void main(String[] args) throws Exception {
@@ -54,7 +48,7 @@ public class Main {
             difficulty[i] = in.nextLong();
         }
 
-        backtracking(difficulty, 0, 0, 0);
+        backtracking(difficulty, 0, 123456789, 0, 0, 0);
 
         System.out.print(cnt);
     }
