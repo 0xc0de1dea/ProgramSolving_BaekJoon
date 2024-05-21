@@ -1,9 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.Arrays;
 
 /**
  * Written by 0xc0de1dea
@@ -11,6 +6,24 @@ import java.util.TreeSet;
  */
 
 public class Main {
+    public static int binarySearch(int[] arr, int target){
+        int left = 0;
+        int right = arr.length - 1;
+
+        while (left <= right){
+            int mid = left + right >> 1;
+
+            if (arr[mid] == target){
+                return mid;
+            } else if (arr[mid] < target){
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return -1;
+    }
 
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
@@ -21,23 +34,17 @@ public class Main {
         int[][] planet = new int[m][n];
 
         for (int i = 0; i < m; i++){
-            TreeSet<Integer> clone = new TreeSet<>();
-
             for (int j = 0; j < n; j++){
                 int b = in.nextInt();
                 planet[i][j] = b;
-                clone.add(b);
-            }
-            
-            HashMap<Integer, Integer> hm = new HashMap<>();
-            int idx = 0;
-            
-            for (int item : clone){
-                hm.put(item, idx++);
             }
 
+            int[] clone = planet[i].clone();
+            int[] sorted = Arrays.stream(clone).sorted().distinct().toArray();
+
             for (int j = 0; j < n; j++){
-                planet[i][j] = hm.get(planet[i][j]);
+                int id = binarySearch(sorted, planet[i][j]);
+                planet[i][j] = id;
             }
         }
 
