@@ -39,8 +39,8 @@ public class Main {
                 planet[i][j] = b;
             }
 
-            int[] clone = planet[i].clone();
-            int[] sorted = Arrays.stream(clone).sorted().distinct().toArray();
+            //int[] clone = planet[i].clone();
+            int[] sorted = Arrays.stream(planet[i]).sorted().distinct().toArray();
 
             for (int j = 0; j < n; j++){
                 int id = binarySearch(sorted, planet[i][j]);
