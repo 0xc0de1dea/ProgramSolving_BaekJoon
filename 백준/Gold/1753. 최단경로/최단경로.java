@@ -32,7 +32,7 @@ public class Main {
 
             if (cur.cost > cost[cur.v]) continue;
             for (Edge next : edges[cur.v]){
-                int newCost = cost[cur.v] + next.cost;
+                int newCost = cur.cost + next.cost;
                 
                 if (newCost < cost[next.v]){
                     cost[next.v] = newCost;
