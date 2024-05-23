@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -66,9 +65,10 @@ class Node {
 }
 
 public class Main {
-    static int[][] edges;
+    static ArrayList<ArrayList<Node>> edges;
     static int[] dist;
     static ArrayList<Integer>[] tracking;
+    static boolean[][] deletedEdge;
 
     public static void dijkstra(int start, int end, int n){
         PriorityQueue<Node> pq = new PriorityQueue<>((o1, o2) -> o1.dist - o2.dist); 
@@ -79,28 +79,15 @@ public class Main {
 
             if (dist[cur.to] < cur.dist) continue;
 
-            for (int nxt = 0; nxt < n; nxt++){
-                if (edges[cur.to][nxt] != 0){
-                    int newDist = cur.dist + edges[cur.to][nxt];
+            for (Node nxt : edges.get(cur.to)){
+                int newDist = cur.dist + nxt.dist;
 
-                    if (dist[nxt] > newDist){
-                        tracking[nxt] = new ArrayList<>(Arrays.asList(cur.to));
-                        dist[nxt] = newDist;
-                        pq.add(new Node(nxt, dist[nxt]));
-                    } else if (dist[nxt] == newDist){
-                        tracking[nxt].add(cur.to);
-                    }
-
-                    // if (dist[nxt] >= newDist){
-                    //     if (dist[nxt] > newDist){
-                    //         tracking[nxt] = new ArrayList<>(Arrays.asList(cur.to));
-                    //     } else if (dist[nxt] == newDist){
-                    //         tracking[nxt].add(cur.to);
-                    //     }
-
-                    //     dist[nxt] = newDist;
-                    //     pq.add(new Node(nxt, dist[nxt]));
-                    // }
+                if (dist[nxt.to] > newDist){
+                    tracking[nxt.to] = new ArrayList<>(Arrays.asList(cur.to));
+                    dist[nxt.to] = newDist;
+                    pq.add(new Node(nxt.to, dist[nxt.to]));
+                } else if (dist[nxt.to] == newDist){
+                    tracking[nxt.to].add(cur.to);
                 }
             }
         }
@@ -115,12 +102,14 @@ public class Main {
 
             if (dist[cur.to] < cur.dist) continue;
             
-            for (int nxt = 0; nxt < n; nxt++){
-                if (edges[cur.to][nxt] != 0){
-                    if (dist[nxt] > cur.dist + edges[cur.to][nxt]){
-                        dist[nxt] = cur.dist + edges[cur.to][nxt];
-                        pq.add(new Node(nxt, dist[nxt]));
-                    }
+            for (Node nxt : edges.get(cur.to)){
+                if (deletedEdge[cur.to][nxt.to]) continue;
+
+                int newDist = cur.dist + nxt.dist;
+
+                if (dist[nxt.to] > newDist){
+                    dist[nxt.to] = newDist;
+                    pq.add(new Node(nxt.to, dist[nxt.to]));
                 }
             }
         }
@@ -130,15 +119,12 @@ public class Main {
         Queue<Integer> queue = new LinkedList<>();
         queue.add(start);
 
-        boolean[][] isVisited = new boolean[n][n];
-
         while (!queue.isEmpty()){
             int cur = queue.poll();
 
             for (int nxt : tracking[cur]){
-                if (!isVisited[nxt][cur]){
-                    isVisited[nxt][cur] = true;
-                    edges[nxt][cur] = 0;
+                if (!deletedEdge[nxt][cur]){
+                    deletedEdge[nxt][cur] = true;
                     queue.add(nxt);
                 }
             }
@@ -158,18 +144,24 @@ public class Main {
             int s = in.nextInt();
             int d = in.nextInt();
 
-            edges = new int[n][n];
-    
+            edges = new ArrayList<>();
+
+            for (int i = 0; i < n; i++){
+                edges.add(new ArrayList<>());
+            }
+
             for (int i = 0; i < m; i++){
                 int a = in.nextInt();
                 int b = in.nextInt();
                 int c = in.nextInt();
     
-                edges[a][b] = c;
+                edges.get(a).add(new Node(b, c));
             }
     
             dist = new int[n];
             tracking = new ArrayList[n];
+            deletedEdge = new boolean[n][n];
+
             final int INF = 123456789;
 
             for (int i = 0; i < n; i++){
@@ -187,8 +179,8 @@ public class Main {
             // }
 
             // for (int i = 0; i < n; i++){
-            //     for (int j = 0; j < n; j++){
-            //         System.out.print(edges[i][j] + " ");
+            //     for (Node item : edges.get(i)){
+            //         System.out.print(item.to + " ");
             //     }
             //     System.out.println();
             // }
