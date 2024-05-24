@@ -151,21 +151,15 @@ public class Main {
             edges.add(new ArrayList<>());
         }
 
-        int idx = 0;
-
         for (int i = 1; i <= n; i++){
             for (int j = 1; j <= n; j++){
                 int c = in.nextInt();
-
-                edges2[idx][0] = i;
-                edges2[idx][1] = j;
-                edges2[idx][2] = c;
-                idx++;
+                edges.get(i).add(new Node(j, c));
             }
         }
 
-        //int res = prim(edges, n);
-        long res = kruskal(edges2, n, n * n);
+        long res = prim(edges, n);
+        //long res = kruskal(edges2, n, n * n);
 
         System.out.println(res == -1 ? -1 : res);
     }
