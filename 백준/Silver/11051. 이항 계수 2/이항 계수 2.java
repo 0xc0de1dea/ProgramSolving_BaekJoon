@@ -19,6 +19,37 @@ public class Main {
         return dp[n][r] = (nCr(n - 1, r - 1) + nCr(n - 1, r)) % MOD;
     }
 
+    public static int pow(int x, int exp){
+        int res = 1;
+
+        while (exp > 0){
+            if ((exp & 1) == 1) res = (res * x) % MOD;
+
+            x = (x * x) % MOD;
+            exp >>= 1;
+        }
+
+        return res;
+    }
+
+    public static int nCrFast(int n , int r){
+        int up = 1;
+
+        for (int i = n; i > n - r; i--){
+            up *= i;
+            up %= MOD;
+        }
+
+        int dn = 1;
+
+        for (int i = 1; i <= r; i++){
+            dn *= i;
+            dn %= MOD;
+        }
+
+        return (up * pow(dn, MOD - 2)) % MOD;
+    }
+
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
@@ -27,7 +58,7 @@ public class Main {
         int k = in.nextInt();
         dp = new int[1_001][1_001];
         
-        System.out.print(nCr(n, k));
+        System.out.print(nCrFast(n, k));
     }
 }
 
