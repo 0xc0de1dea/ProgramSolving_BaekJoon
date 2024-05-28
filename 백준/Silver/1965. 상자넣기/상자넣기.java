@@ -1,37 +1,44 @@
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
 public class Main {
+    public static int lowerbound(int[] arr, int left, int right, int target){
+        while (left < right){
+            int mid = left + right >> 1;
+
+            if (arr[mid] < target){
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return left;
+    }
 
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        int[] seq = new int[n + 1];
-        int[] dp = new int[n + 1];
+        int[] lis = new int[n + 1];
+        int idx = 0;
 
         for (int i = 1; i <= n; i++){
-            seq[i] = in.nextInt();
-        }
+            int num = in.nextInt();
 
-        int max = 0;
-
-        for (int i = 1; i <= n; i++){
-            dp[i] = 1;
-
-            for (int j = 1; j < i; j++){
-                if (seq[i] > seq[j]){
-                    dp[i] = Math.max(dp[i], dp[j] + 1);
-                }
+            if (lis[idx] < num){
+                lis[++idx] = num;
+            } else {
+                lis[lowerbound(lis, 0, idx, num)] = num;
             }
-
-            max = Math.max(max, dp[i]);
         }
 
-        System.out.print(max);
+        System.out.print(idx);
     }
 }
 
