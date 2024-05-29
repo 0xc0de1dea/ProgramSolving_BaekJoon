@@ -7,16 +7,6 @@ import java.util.Queue;
  * Email : 0xc0de1dea@gmail.com
  */
 
-class Node {
-    int to;
-    int cost;
-
-    public Node(int to, int cost){
-        this.to = to;
-        this.cost = cost;
-    }
-}
-
 public class Main {
     static int[] ans;
     static int[] inDegree;
@@ -24,11 +14,11 @@ public class Main {
     static ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
 
     public static boolean topologySort(int n){
-        Queue<Node> queue = new LinkedList<>();
+        Queue<Integer> queue = new LinkedList<>();
         
         for (int i = 1; i <= n; i++){
             if (inDegree[i] == 0){
-                queue.add(new Node(i, cost[i]));
+                queue.add(i);
                 ans[i] = cost[i];
             }
         }
@@ -38,13 +28,13 @@ public class Main {
                 return false;
             }
 
-            Node cur = queue.poll();
+            int cur = queue.poll();
 
-            int maxCost = Math.max(ans[cur.to], cost[cur.to]);
+            int maxCost = Math.max(ans[cur], cost[cur]);
 
-            for (int nxt : edges.get(cur.to)){
+            for (int nxt : edges.get(cur)){
                 if (--inDegree[nxt] == 0){
-                    queue.add(new Node(nxt, maxCost + cost[nxt]));
+                    queue.add(nxt);
                 }
 
                 ans[nxt] = Math.max(ans[nxt], maxCost + cost[nxt]);
