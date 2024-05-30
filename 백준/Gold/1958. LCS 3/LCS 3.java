@@ -18,10 +18,10 @@ public class Main {
         for (int i = 1; i <= a.length; i++){
             for (int j = 1; j <= b.length; j++){
                 for (int k = 1; k <= c.length; k++){
+                    dp[i][j][k] = Math.max(Math.max(dp[i - 1][j][k], dp[i][j - 1][k]), dp[i][j][k - 1]);
+                    
                     if (a[i - 1] == b[j - 1] && b[j - 1] == c[k - 1]){
                         dp[i][j][k] = dp[i - 1][j - 1][k - 1] + 1;
-                    } else {
-                        dp[i][j][k] = Math.max(Math.max(dp[i - 1][j][k], dp[i][j - 1][k]), dp[i][j][k - 1]);
                     }
 
                     max = Math.max(max, dp[i][j][k]);
