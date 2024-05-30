@@ -7,41 +7,36 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-        final int MOD = (int)1e9;
-        int[][] dp = new int[2][10];
-
-        for (int i = 1; i <= 9; i++){
-            dp[0][i] = 1;
-        }
 
         int n = in.nextInt();
+        int[][] dp = new int[101][10];
+        final int MOD = 1_000_000_000;
+        
+        for (int i = 1; i <= 9; i++){
+            dp[1][i] = 1;
+        }
 
-        for (int i = 2; i <= n; i++){
-            for (int j = 0; j <= 9; j++){
+        for (int i = 2; i <= 100; i++){
+            for (int j = 0; j < 10; j++){
                 if (j - 1 >= 0){
-                    dp[1][j] += dp[0][j - 1];
-                    dp[1][j] %= MOD;
+                    dp[i][j - 1] += dp[i - 1][j];
+                    dp[i][j - 1] %= MOD;
                 }
 
                 if (j + 1 <= 9){
-                    dp[1][j] += dp[0][j + 1];
-                    dp[1][j] %= MOD;
+                    dp[i][j + 1] += dp[i - 1][j];
+                    dp[i][j + 1] %= MOD;
                 }
-            }
-            
-            for (int j = 0; j <= 9; j++){
-                dp[0][j] = dp[1][j];
-                dp[1][j] = 0;
             }
         }
 
         int cnt = 0;
 
         for (int i = 0; i <= 9; i++){
-            cnt = (cnt + dp[0][i]) % MOD;
+            cnt += dp[n][i];
+            cnt %= MOD;
         }
 
         System.out.print(cnt);
@@ -58,7 +53,7 @@ class Reader {
         byte c;
         while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
