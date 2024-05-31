@@ -23,8 +23,16 @@ public class Main {
             return dp[depth][l][r];
         }
 
-        int left = search(n, depth + 1, seq.get(depth), r) + cost[l][seq.get(depth)];
-        int right = search(n, depth + 1, l, seq.get(depth)) + cost[r][seq.get(depth)];
+        int left = 123456789;
+        int right = 123456789;
+
+        if (right != seq.get(depth)){
+            left = search(n, depth + 1, seq.get(depth), r) + cost[l][seq.get(depth)];
+        }
+        
+        if (left != seq.get(depth)){
+            right = search(n, depth + 1, l, seq.get(depth)) + cost[r][seq.get(depth)];
+        }
 
         return dp[depth][l][r] = Math.min(left, right);
     }
