@@ -1,77 +1,33 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
 public class Main {
-    static int[] ans;
-    static int[] inDegree;
-    static int[] cost;
-    static ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
-
-    public static boolean topologySort(int n){
-        Queue<Integer> queue = new LinkedList<>();
-
-        for (int i = 1; i <= n; i++){
-            if (inDegree[i] == 0){
-                queue.add(i);
-                ans[i] = cost[i];
-            }
-        }
-
-        for (int i = 1; i <= n; i++){
-            if (queue.isEmpty()){
-                return false;
-            }
-
-            int cur = queue.poll();
-
-            for (int nxt : edges.get(cur)){
-                if (--inDegree[nxt] == 0){
-                    queue.add(nxt);
-                }
-
-                ans[nxt] = Math.max(ans[nxt], ans[cur] + cost[nxt]);
-            }
-        }
-        
-        return true;
-    }
-
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        ans = new int[n + 1];
-        inDegree = new int[n + 1];
-        cost = new int[n + 1];
-
-        for (int i = 0; i <= n; i++){
-            edges.add(new ArrayList<>());
-        }
+        int[] dp = new int[n + 1];
 
         for (int i = 1; i <= n; i++){
-            cost[i] = in.nextInt();
+            dp[i] = in.nextInt();
             int m = in.nextInt();
+            int max = 0;
 
             for (int j = 0; j < m; j++){
                 int pre = in.nextInt();
-                edges.get(pre).add(i);
-                inDegree[i]++;
+                max = Math.max(max, dp[pre]);
             }
-        }
 
-        topologySort(n);
+            dp[i] += max;
+        }
 
         int max = 0;
 
         for (int i = 1; i <= n; i++){
-            max = Math.max(max, ans[i]);
+            max = Math.max(max, dp[i]);
         }
 
         System.out.print(max);
