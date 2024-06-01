@@ -1,59 +1,60 @@
-import java.util.ArrayList;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-class Edge {
-    int a, b;
-    int cost;
-
-    public Edge(int a, int b, int cost){
-        this.a = a;
-        this.b = b;
-        this.cost = cost;
-    }
-}
-
 public class Main {
     static final int INF = 123456789;
-    static int[] dist;
+    static int n, m;
+    static int[][] map;
+    static int[][][] dp;
+    static boolean[][] isVisited;
     static int[] dx = { 0, 1, 0, -1 };
     static int[] dy = { 1, 0, -1, 0 };
 
-    public static boolean bellmanford(ArrayList<Edge> edges, int n, int m){
-        boolean isUpdate = false;
+    public static int dfs(int x, int y, int state){
+        if (dp[x][y][state] > 0) return dp[x][y][state];
 
-        for (int i = 0; i < n; i++){
-            isUpdate = false;
+        int max = 0;
 
-            for (int j = 0; j < m; j++){
-                Edge cur = edges.get(j);
+        isVisited[x][y] = true;
+        boolean flag = false;
 
-                if (dist[cur.a] == INF) continue;
+        // 0 : >, 1 : v, 2 : <, 3 : ^
+        for (int i = 0; i < 4; i++){
+            int nx = x + dx[i] * map[x][y];
+            int ny = y + dy[i] * map[x][y];
 
-                if (dist[cur.b] > dist[cur.a] + cur.cost){
-                    dist[cur.b] = dist[cur.a] + cur.cost;
-                    isUpdate = true;
+            if (0 <= nx && nx < n && 0 <= ny && ny < m && map[nx][ny] != -1){
+                if (isVisited[nx][ny]){
+                    return -1;
+                } else {
+                    int res = dfs(nx, ny, i);
+
+                    if (res == -1) return -1;
+
+                    max = Math.max(max, res);
+                    flag = true;
                 }
             }
-
-            if (!isUpdate) break;
         }
 
-        if (isUpdate) return true;
-        else return false;
+        isVisited[x][y] = false;
+
+        if (!flag) return dp[x][y][state] = 1;
+
+        return dp[x][y][state] = 1 + max;
     }
 
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        int n = in.nextInt();
-        int m = in.nextInt();
-        int[][] map = new int[n][m];
-        dist = new int[n * m];
+        n = in.nextInt();
+        m = in.nextInt();
+        map = new int[n][m];
+        dp = new int[n][m][4];
+        isVisited = new boolean[n][m];
 
         for (int i = 0; i < n; i++){
             for (int j = 0; j < m; j++){
@@ -67,49 +68,9 @@ public class Main {
             }
         }
 
-        for (int i = 0; i < n * m; i++){
-            dist[i] = INF;
-        }
+        int res = dfs(0, 0, 0);
 
-        dist[0] = -1;
-
-        ArrayList<Edge> edges = new ArrayList<>();
-
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < m; j++){
-                int num = map[i][j];
-
-                if (num == -1) continue;
-                
-                int curNode = i * m + j;
-
-                for (int k = 0; k < 4; k++){
-                    int nx = i + dx[k] * num;
-                    int ny = j + dy[k] * num;
-                    
-                    if (0 <= nx && nx < n && 0 <= ny && ny < m){
-                        int nxtNode = nx * m + ny;
-                        edges.add(new Edge(curNode, nxtNode, -1));
-                    }
-                }
-            }
-        }
-
-        if (bellmanford(edges, n * m, edges.size())){
-            sb.append(-1);
-        } else {
-            int max = 0;
-
-            for (int i = 0; i < n * m; i++){
-                if (dist[i] != INF && map[i / m][i % m] != -1){
-                    max = Math.max(max, Math.abs(dist[i]));
-                }
-            }
-
-            sb.append(max);
-        }
-
-        System.out.print(sb);
+        System.out.print(res);
     }
 }
 
