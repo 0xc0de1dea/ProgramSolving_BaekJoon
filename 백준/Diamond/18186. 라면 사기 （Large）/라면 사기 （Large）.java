@@ -48,7 +48,7 @@ public class Main {
         for (int i = 1; i <= n; i++){
             if (ramen[i] == 0) continue;
 
-            if (b < c){
+            if (b <= c){
                 cost += buy1(ramen, i);
             } else {
                 if (ramen[i + 1] > ramen[i + 2]){
