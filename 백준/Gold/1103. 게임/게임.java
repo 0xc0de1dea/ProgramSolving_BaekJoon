@@ -7,13 +7,13 @@ public class Main {
     static final int INF = 123456789;
     static int n, m;
     static int[][] map;
-    static int[][][] dp;
+    static int[][] dp;
     static boolean[][] isVisited;
     static int[] dx = { 0, 1, 0, -1 };
     static int[] dy = { 1, 0, -1, 0 };
 
-    public static int dfs(int x, int y, int state){
-        if (dp[x][y][state] > 0) return dp[x][y][state];
+    public static int dfs(int x, int y){
+        if (dp[x][y] > 0) return dp[x][y];
 
         int max = 0;
 
@@ -29,7 +29,7 @@ public class Main {
                 if (isVisited[nx][ny]){
                     return -1;
                 } else {
-                    int res = dfs(nx, ny, i);
+                    int res = dfs(nx, ny);
 
                     if (res == -1) return -1;
 
@@ -41,9 +41,9 @@ public class Main {
 
         isVisited[x][y] = false;
 
-        if (!flag) return dp[x][y][state] = 1;
+        if (!flag) return dp[x][y] = 1;
 
-        return dp[x][y][state] = 1 + max;
+        return dp[x][y] = 1 + max;
     }
 
     public static void main(String[] args) throws Exception {
@@ -53,7 +53,7 @@ public class Main {
         n = in.nextInt();
         m = in.nextInt();
         map = new int[n][m];
-        dp = new int[n][m][4];
+        dp = new int[n][m];
         isVisited = new boolean[n][m];
 
         for (int i = 0; i < n; i++){
@@ -68,7 +68,7 @@ public class Main {
             }
         }
 
-        int res = dfs(0, 0, 0);
+        int res = dfs(0, 0);
 
         System.out.print(res);
     }
