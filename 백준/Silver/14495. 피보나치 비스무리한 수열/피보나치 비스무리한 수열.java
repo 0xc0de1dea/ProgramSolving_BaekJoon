@@ -4,19 +4,24 @@
  */
 
 public class Main {
+    static long[] dp;
+
+    public static long dp(int n){
+        if (n == 1 || n == 2 || n == 3) return 1;
+
+        if (dp[n] > 0) return dp[n];
+
+        return dp[n] = dp(n - 1) + dp(n - 3);
+    }
+
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        long[] dp = new long[117];
-        dp[1] = dp[2] = dp[3] = 1;
+        dp = new long[117];
 
-        for (int i = 4; i <= n; i++){
-            dp[i] = dp[i - 1] + dp[i - 3];
-        }
-
-        System.out.println(dp[n]);
+        System.out.println(dp(n));
     }
 }
 
