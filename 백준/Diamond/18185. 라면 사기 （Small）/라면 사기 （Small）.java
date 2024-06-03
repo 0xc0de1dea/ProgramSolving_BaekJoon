@@ -5,8 +5,28 @@ import java.util.Arrays;
  * Email : 0xc0de1dea@gmail.com
  */
 
- // 부계 실험용
 public class Main {
+    public static int buy1(int[] ramen, int cur){
+        return 3 * ramen[cur];
+    }
+
+    public static int buy2(int[] ramen, int cur){
+        int min = Math.min(ramen[cur], ramen[cur + 1]);
+        ramen[cur] -= min;
+        ramen[cur + 1] -= min;
+
+        return 5 * min;
+    }
+
+    public static int buy3(int[] ramen, int cur){
+        int min = Math.min(ramen[cur], Math.min(ramen[cur + 1], ramen[cur + 2]));
+        ramen[cur] -= min;
+        ramen[cur + 1] -= min;
+        ramen[cur + 2] -= min;
+
+        return 7 * min;
+    }
+
     public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
@@ -20,59 +40,21 @@ public class Main {
 
         int cost = 0;
 
-        while (true){
-            boolean flag = false;
+        for (int i = 1; i <= n; i++){
+            if (ramen[i] == 0) continue;
 
-            for (int i = 1; i <= n; i++){
-                if (ramen[i] == 0) continue;
-
-                int min = 123456789;
-                int cnt = 0;
-
-                if (ramen[i] > 0){
-                    min = Math.min(min, ramen[i]);
-                    cnt = 1;
-
-                    if (ramen[i + 1] > 0){
-                        min = Math.min(min, ramen[i + 1]);
-                        cnt = 2;
-    
-                        if (ramen[i + 2] > 0){
-                            min = Math.min(min, ramen[i + 2]);
-                            cnt = 3;
-
-                            if (ramen[i + 1] > ramen[i + 2]){
-                                min = Math.min(min, ramen[i + 1] - ramen[i + 2]);
-                                cnt = 2;
-                            }
-                        }
-                    }
-                }
-
-                //System.out.println(Arrays.toString(ramen));
-
-                if (cnt == 1){
-                    cost += 3 * min;
-                    ramen[i] -= min;
-                    flag = true;
-                    break;
-                } else if (cnt == 2){
-                    cost += 5 * min;
-                    ramen[i] -= min;
-                    ramen[i + 1] -= min;
-                    flag = true;
-                    break;
-                } else if (cnt == 3){
-                    cost += 7 * min;
-                    ramen[i] -= min;
-                    ramen[i + 1] -=min;
-                    ramen[i + 2] -= min;
-                    flag = true;
-                    break;
-                }
+            if (ramen[i + 1] > ramen[i + 2]){
+                int min = Math.min(ramen[i], ramen[i + 1] - ramen[i + 2]);
+                ramen[i] -= min;
+                ramen[i + 1] -= min;
+                cost += 5 * min;
+                cost += buy3(ramen, i);
+                cost += buy1(ramen, i);
+            } else {
+                cost += buy3(ramen, i);
+                cost += buy2(ramen, i);
+                cost += buy1(ramen, i);
             }
-
-            if (!flag) break;
         }
 
         System.out.println(cost);
