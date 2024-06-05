@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Written by 0xc0de1dea
@@ -672,30 +675,410 @@ class PollardRho extends MillerRabin {
     }
 }
 
+class Miller_Rabin{
+    public long gcd(long n, long m){
+        if(n==0) return (m>0)?m:-m;
+        return gcd(m%n, n);
+    }
+    public long addmod(long a, long b, long mod){
+        return a>=mod-b ? a+(b-mod) : a+b;
+    }
+    public long mulmod(long a, long b, long mod){
+        long x = 0;
+        while(b>0){
+            if((b&1)>0) x = addmod(x,a,mod);
+            a = addmod(a,a,mod);
+            b>>=1;
+        }
+        return x;
+    }
+    public long powmod(long a, long b, long mod){
+        long x = 1;
+        while(b>0){
+            if((b&1)>0) x = mulmod(x,a,mod);
+            a = mulmod(a,a,mod);
+            b>>=1;
+        }
+        return x;
+    }
+    public boolean miller_rabin(long x, long n){
+        if(x%n==0) return false;
+        long d = x-1;
+        while((d&1)==0){
+            if(powmod(n,d,x)==x-1)
+                return true;
+            d>>=1;
+        }
+        long tmp = powmod(n,d,x);
+        return tmp == 1 || tmp == x-1;
+    }
+    public boolean isPrime(long n){
+        if(n==1) return false;
+        long[] li = new long[]{2,3,5,7,11,13,17,19,23,29,31,37};
+        for(long a:li){
+            if(n==a) return true;
+            if(n>40 && !miller_rabin(n,a)) return false;
+        }
+        if(n<=40) return false;
+        return true;
+    }
+}
+
+class Pollard_rho{
+    Miller_Rabin m = new Miller_Rabin();
+    public long g(long x, long c, long mod){
+        return m.addmod(m.mulmod(x,x,mod),c,mod);
+    }
+    public void rec(long n, ArrayList<Long> arr){
+        if(n==1) return;
+        if(n%2==0){
+            arr.add(2L);
+            rec(n/2,arr);
+            return;
+        }
+        if(m.isPrime(n)){
+            arr.add(n); return;
+        }
+        long a=1,b=1,c=1,d=n;
+        do{
+            if(d==n){
+                a=b=(long)(Math.random()*(n-3))+2;
+                c=(long)(Math.random()*19)+1;
+            }
+            a=g(a,c,n); b=g(g(b,c,n),c,n);
+            d = m.gcd(a-b,n);
+        }while(d==1);
+        rec(d,arr);
+        rec(n/d,arr);
+    }
+    public ArrayList<Long> factorize(long n){
+        ArrayList<Long> arr = new ArrayList<>();
+        rec(n,arr);
+        // HashMap<Long,Long> m = new HashMap<>();
+        // for(long d:arr)
+        //     m.put(d,m.getOrDefault(d,0L)+1);
+        return arr;
+    }
+}
+
 public class Main {
-    static long fastPow(long x, long y, long mod){
-        long ret = 1; x %= mod;
+    static long add(long x, long y, long mod){
+        x %= mod; y %= mod;
+        return (x >= mod - y ? x - (mod - y) : x + y);
+    }
+
+    static long mul(long x, long y, long mod){
+        long ret = 0; x %= mod; y %= mod;
 
         while (y > 0){
-            if ((y & 1) == 1) ret = (ret * x) % mod;
-            x = (x * x) % mod; y >>= 1;
+            if ((y & 1) == 1) ret = add(ret, x, mod);
+            x = add(x, x, mod); y >>= 1;
         }
 
         return ret;
     }
 
-    public static void main(String[] args) throws Exception {
-        Reader in = new Reader();
-        StringBuilder sb = new StringBuilder();
+    static long pow(long x, long y, long mod){
+        long ret = 1; x %= mod;
 
-        long n = in.nextLong();
+        while (y > 0){
+            if ((y & 1) == 1) ret = mul(ret, x, mod);
+            x = mul(x, x, mod); y >>= 1;
+        }
 
-        if ((long)Math.sqrt(n) * (long)Math.sqrt(n) == n) System.out.print(1);
+        return ret;
+    }
+
+    public static long sqrt(long n) {
+        ArrayList<Long> L = new PollardRho().factorize(n);
+        HashMap<Long, Long> d = new HashMap<>();
+
+        for (long i : L) {
+            d.put(i, d.getOrDefault(i, 0L) + 1);
+        }
+
+        long res = 1;
+        
+        for (long i : d.keySet()) {
+            res *= pow(i, d.get(i) / 2, Long.MAX_VALUE);
+        }
+
+        return res;
+    }
+
+    // static long tonelliShanks2(long n, long p){
+    //     long s = 0;
+    //     long q = p - 1;
+
+    //     while ((q & 1) == 0){
+    //         q /= 2;
+    //         ++s;
+    //     }
+
+    //     if (s == 1){
+    //         long r = pow(n, (p + 1) / 4, p);
+            
+    //         if (mul(r, r, p) == n) {
+    //             return r;
+    //         }
+
+    //         return 1;
+    //     }
+
+    //     long z = 1;
+
+    //     while (pow(++z, (p - 1) / 2, p) != p - 1){
+    //         //if (z <= 10){
+    //             // System.out.println();
+    //             // System.out.println(z + " " + (p - 1) / 2 + " " + p);
+    //             // System.out.println(pow(z, (p - 1) / 2, p) + " " + (p - 1));
+    //         //}
+    //     }
+
+    //     long c = pow(z, q, p);
+    //     long r = pow(n, (q + 1) / 2, p);
+    //     long t = pow(n, q, p);
+    //     long m = s;
+
+    //     while (t != 1){
+    //         long tt = t;
+    //         long i = 0;
+
+    //         while (tt != 1){
+    //             tt = mul(tt, tt, p);
+    //             ++i;
+
+    //             if (i == m){
+    //                 return 1;
+    //             }
+    //         }
+
+    //         long b = pow(c, pow(2, m - i - 1, p - 1), p);
+    //         long b2 = mul(b, b, p);
+    //         r = mul(r, b, p);
+    //         t = mul(t, b2, p);
+    //         c = b2;
+    //         m = i;
+    //     }
+
+    //     if (mul(r, r, p) == n){
+    //         return r;
+    //     }
+
+    //     return 1;
+    // }
+
+    // static long[] cornacchia4(long n){
+    //     BigInteger r1 = new BigInteger(String.valueOf(n));
+    //     BigInteger r2 = new BigInteger(String.valueOf(tonelliShanks2(n - 1, n)));
+
+    //     System.out.println();
+    //     System.out.println(r1 + " " + r2);
+
+    //     while (r1.multiply(r1).compareTo(new BigInteger(String.valueOf(n))) != -1){
+    //         BigInteger t = r1.mod(r2);
+    //         r1 = new BigInteger(r2.toString());
+    //         r2 = new BigInteger(t.toString());
+    //     }
+
+    //     long x = r1.longValue();
+    //     long y = (long)Math.sqrt(n - r1.longValue() * r1.longValue());
+
+    //     return new long[] { x, y };
+    // }
+
+    // static long[] cornacchia3(long n){
+    //     BigInteger r1 = new BigInteger(String.valueOf(n));
+    //     BigInteger r2;
+    //     BigInteger n2 = new BigInteger(String.valueOf(n)).divide(BigInteger.TWO);
+
+    //     for (r2 = BigInteger.ONE; r2.compareTo(n2) != 1; r2 = r2.add(BigInteger.ONE)){
+    //         if ((r2.multiply(r2)).mod(r1).equals(r1.subtract(BigInteger.ONE))){
+    //             break;
+    //         }
+    //     }
+
+    //     System.out.println();
+    //     System.out.println(r1 + " " + r2);
+
+    //     while (r1.multiply(r1).compareTo(new BigInteger(String.valueOf(n))) != -1){
+    //         BigInteger t = r1.mod(r2);
+    //         r1 = new BigInteger(r2.toString());
+    //         r2 = new BigInteger(t.toString());
+    //     }
+
+    //     long x = r1.longValue();
+    //     long y = (long)Math.sqrt(n - r1.longValue() * r1.longValue());
+
+    //     return new long[] { x, y };
+    // }
+
+    // static long[] cornacchia2(long n){
+    //     long r1 = n;
+    //     long r2;
+
+    //     for (r2 = 1; r2 <= n / 2; r2++){
+    //         if ((r2 * r2) % r1 == r1 - 1){
+    //             break;
+    //         }
+    //     }
+
+    //     System.out.println();
+    //     System.out.println(r1 + " " + r2);
+
+    //     while (r1 * r1 >= n){
+    //         long tmp = r1 % r2;
+    //         r1 = r2;
+    //         r2 = tmp;
+    //     }
+
+    //     long x = r1;
+    //     long y = (long)Math.sqrt(n - x * x);
+
+    //     return new long[] { x, y };
+    // }
+
+    // public static long modPow(long base, long exp, long mod) {
+    //     long result = 1;
+    //     while (exp > 0) {
+    //         if (exp % 2 == 1) {
+    //             result = (result * base) % mod;
+    //         }
+    //         base = (base * base) % mod;
+    //         exp /= 2;
+    //     }
+    //     return result;
+    // }
+
+    // public static long modMul(long a, long b, long mod) {
+    //     return (a * b) % mod;
+    // }
+
+    // static class Pair<A, B> {
+    //     public final A first;
+    //     public final B second;
+
+    //     public Pair(A first, B second) {
+    //         this.first = first;
+    //         this.second = second;
+    //     }
+    // }
+
+    public static BigInteger tonelli(long p) {
+        long q = p - 1;
+        long s = 0;
+        while (q % 2 == 0) {
+            q /= 2;
+            s++;
+        }
+        
+        BigInteger bp = new BigInteger(String.valueOf(p));
+        BigInteger z = new BigInteger(String.valueOf((long) (Math.random() * (p - 2) + 2)));
+        while (z.modPow((bp.subtract(BigInteger.ONE)).divide(new BigInteger("2")), bp).equals(BigInteger.ONE)) {
+            z = new BigInteger(String.valueOf((long) (Math.random() * (p - 2) + 2)));
+        }
+        BigInteger m = new BigInteger(String.valueOf(s));
+        BigInteger c = new BigInteger(String.valueOf(pow(z.longValue(), q, p)));
+        BigInteger t = new BigInteger(String.valueOf(pow(p - 1, q, p)));
+        BigInteger r = new BigInteger(String.valueOf(pow(p - 1, (q + 1) / 2, p)));
+
+        if (t.equals(BigInteger.ZERO)) return BigInteger.ZERO;
+        while (!t.equals(BigInteger.ONE) && !t.equals(BigInteger.ZERO)) {
+            BigInteger tt = t;
+            BigInteger i = BigInteger.ZERO;
+            while (!t.mod(bp).equals(BigInteger.ONE)) {
+                t = t.modPow(new BigInteger("2"), bp);
+                i = i.add(BigInteger.ONE);
+            }
+            BigInteger b = c.modPow(new BigInteger("2").modPow(m.subtract(i).subtract(BigInteger.ONE), bp), bp);
+            m = i;
+            c = b.modPow(new BigInteger("2"), bp);
+            t = (tt.multiply(c)).mod(bp);
+            r = (r.multiply(b)).mod(bp);
+        }
+        return r;
+    }
+
+    public static BigInteger tonelli2(long p) {
+        long q = p - 1;
+        long s = 0;
+        while (q % 2 == 0) {
+            q /= 2;
+            s++;
+        }
+        long z = (long) (Math.random() * (p - 2) + 2);
+        while (pow(z, (p - 1) / 2, p) == 1) {
+            z = (long) (Math.random() * (p - 2) + 2);
+        }
+        long m = s;
+        long c = pow(z, q, p);
+        long t = pow(p - 1, q, p);
+        long r = pow(p - 1, (q + 1) / 2, p);
+
+        if (t == 0) return BigInteger.ZERO;
+        while (t != 1 && t != 0) {
+            long tt = t;
+            long i = 0;
+            while (t % p != 1) {
+                t = pow(t, 2, p);
+                i++;
+            }
+            long b = pow(c, pow(2, m - i - 1, p), p);
+            m = i;
+            c = pow(b, 2, p);
+            t = (tt * c) % p;
+            r = (r * b) % p;
+        }
+        return new BigInteger(String.valueOf(r));
+    }
+
+    public static long cornacchia(long p) {
+        if (p % 4 == 3) return -1;
+        if (p == 2) return 1;
+
+        BigInteger r = tonelli(p);
+        BigInteger rr = new BigInteger(String.valueOf(p));
+        BigInteger pp = new BigInteger(String.valueOf(p));
+        
+        while (r.multiply(r).compareTo(pp) == 1) {
+            rr = rr.mod(r);
+            if (rr.multiply(rr).compareTo(pp) == -1) return rr.longValue();
+            r = r.mod(rr);
+        }
+        
+        return r.longValue();
+    }
+
+    // public static int counting(long n){
+    //     ArrayList<Long> list = new PollardRho().factorize(n);
+    //     HashMap<Long, Long> factMap = new HashMap<>();
+
+    //     for (long i : list){
+    //         factMap.put(i, factMap.getOrDefault(i, 0L) + 1);
+    //     }
+
+    //     boolean flag = true;
+    //     boolean flag2 = true;
+
+    //     for (long val : factMap.keySet()){
+    //         if (factMap.get(val) % 2 != 0) flag = false;
+    //         if (val % 4 == 3 && factMap.get(val) % 2 != 0) flag2 = false;
+    //     }
+
+    //     if (flag) return 1;
+    //     if (flag2) return 2;
+    //     while (n % 4 == 0) n /= 4;
+    //     if (n % 8 != 7) return 3;
+    //     return 4;
+    // }
+
+    public static int counting(long n){
+        if ((long)Math.sqrt(n) * (long)Math.sqrt(n) == n) return 1;
         else {
             while (n % 4 == 0) n /= 4;
-            if (n % 8 == 7) System.out.print(4);
+            if (n % 8 == 7) return 4;
             else {
-                ArrayList<Long> primeFactor = new ArrayList<>();;
+                ArrayList<Long> primeFactor = new ArrayList<>();
                 primeFactor = new MillerRabin().isPrime(n) ? new ArrayList<>(Arrays.asList(n)) : new PollardRho().factorize(n);
                 primeFactor.add(0L);
                 int exp = 1;
@@ -703,17 +1086,319 @@ public class Main {
                 for (int i = 1; i < primeFactor.size(); i++){
                     if (Long.compare(primeFactor.get(i), primeFactor.get(i - 1)) != 0){
                         if (primeFactor.get(i - 1) % 4 == 3 && (exp & 1) == 1){
-                            System.out.print(3);
-                            return;
+                            return 3;
                         }
                         else exp = 1;
                     }
                     else exp++;
                 }
 
-                System.out.print(2);
+                return 2;
             }
         }
+    }
+
+    public static long[] get1(long n){
+        return new long[] { (long)Math.sqrt(n) };
+    }
+
+    public static long[] get2(long n){
+        ArrayList<Long> list = new PollardRho().factorize(n);
+        TreeMap<Long, Long> factMap = new TreeMap<>();
+
+        for (long i : list){
+            factMap.put(i, factMap.getOrDefault(i, 0L) + 1);
+        }
+
+        long mul = 1;
+        ArrayList<Long> list2 = new ArrayList<>();
+
+        for (long key : factMap.keySet()){
+            mul *= pow(key, factMap.get(key) / 2, Long.MAX_VALUE);
+
+            if (factMap.get(key) % 2 != 0){
+                list2.add(key);
+            }
+        }
+
+        long[] ans = { 1, 0 };
+
+        for (long val : list2){
+            long k = cornacchia(val);
+            long[] res = { k, sqrt(val - k * k) };
+            long a = ans[0], b = ans[1];
+            long c = res[0], d = res[1];
+            ans[0] = a * d + b * c;
+            ans[1] = Math.abs(a * c - b * d);
+        }
+
+        ans[0] *= mul;
+        ans[1] *= mul;
+
+        return ans;
+    }
+
+    public static long[] get3(long n){
+        ArrayList<Long> list = new PollardRho().factorize(n);
+        HashMap<Long, Long> factMap = new HashMap<>();
+
+        for (long i : list){
+            factMap.put(i, factMap.getOrDefault(i, 0L) + 1);
+        }
+
+        long mul = 1;
+        long newN = 1;
+
+        for (long val : factMap.keySet()){
+            mul *= pow(val, factMap.get(val) / 2, Long.MAX_VALUE);
+            newN *= pow(val, factMap.get(val) % 2, Long.MAX_VALUE);
+        }
+
+        long t = 1;
+
+        while (counting(newN - t * t) != 2){
+            t++;
+        }
+
+        long[] ans = get2(newN - t * t);
+        ans[0] *= mul;
+        ans[1] *= mul;
+        ans = Arrays.copyOf(ans, ans.length + 1);
+        ans[2] = t * mul;
+
+        return ans;
+    }
+
+    public static long[] get4(long n){
+        int a = 0;
+
+        while (n % 4 == 0){
+            a++;
+            n /= 4;
+        }
+
+        long[] ans = get3(n - 1);
+        long twoPowA = pow(2, a, Long.MAX_VALUE);
+
+        for (int i = 0; i < ans.length; i++){
+            ans[i] *= twoPowA;
+        }
+
+        ans = Arrays.copyOf(ans, ans.length + 1);
+        ans[ans.length - 1] = twoPowA;
+
+        return ans;
+    }
+
+    public static long quotient(BigInteger a, BigInteger b){
+        BigInteger tmp = a.mod(b);
+
+        if (tmp.compareTo(BigInteger.ZERO) == -1) tmp = tmp.add(b);
+        if (b.compareTo(new BigInteger("2").multiply(tmp)) == -1) tmp = tmp.subtract(b);
+
+        return (a.subtract(tmp).divide(b)).longValue();
+    }
+
+    public static long[] div(long n1, long n2, long m1, long m2){
+        BigInteger bn1 = new BigInteger(String.valueOf(n1));
+        BigInteger bn2 = new BigInteger(String.valueOf(n2));
+        BigInteger bm1 = new BigInteger(String.valueOf(m1));
+        BigInteger bm2 = new BigInteger(String.valueOf(m2));
+
+        BigInteger tmp = (bm1.multiply(bm1)).add((bm2.multiply(bm2)));
+        long t1 = quotient((bn1.multiply(bm1)).add((bn2.multiply(bm2))), tmp);
+        long t2 = quotient((bn2.multiply(bm1)).subtract((bn1.multiply(bm2))), tmp);
+
+        return new long[] { t1, t2 };
+    }
+
+    public static long[] mmod(long n1, long n2, long m1, long m2){
+        long[] tmp = div(n1, n2, m1, m2);
+        long t1 = tmp[0], t2 = tmp[1];
+        long r1 = n1 - t1 * m1 + t2 * m2;
+        long r2 = n2 - t1 * m2 - t2 * m1;
+
+        return new long[] { r1, r2 };
+    }
+
+    public static long[] ggcd(long n1, long n2, long m1, long m2){
+        while (m1 != 0 || m2 != 0){
+            long[] tmp = mmod(n1, n2, m1, m2);
+            n1 = m1; n2 = m2;
+            m1 = tmp[0]; m2 = tmp[1];
+        }
+
+        return new long[] { n1, n2 };
+    }
+
+    public static long residue(long n){
+        long tmp = n / 4;
+
+        for (long i = 2; ; i++){
+            long t1 = pow(i, tmp, n);
+            long t2 = mul(t1, t1, n);
+
+            if (t2 == n - 1) return t1;
+        }
+    }
+
+    public static long[] p2p(long n){
+        if (n == 2) return new long[] { 1, 1 };
+
+        long tmp = residue(n);
+        long[] res = ggcd(n, 0, tmp, 1);
+        res[0] = Math.abs(res[0]);
+        res[1] = Math.abs(res[1]);
+
+        return res;
+    }
+
+    public static long upperbound(ArrayList<Long> list, int left, int right, long target){
+        while (left < right){
+            int mid = left + right >> 1;
+
+            if (list.get(mid) <= target){
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return left;
+    }
+
+    public static long lowerbound(ArrayList<Long> list, int left, int right, long target){
+        while (left < right){
+            int mid = left + right >> 1;
+
+            if (list.get(mid) < target){
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        return left;
+    }
+
+    public static boolean chk2(long n){
+        ArrayList<Long> list = new PollardRho().factorize(n);
+        Collections.sort(list);
+
+        boolean chk2 = true;
+
+        for (long i : list){
+            if (((i & 3) == 3) && (((upperbound(list, 0, list.size(), i) - lowerbound(list, 0, list.size(), i)) & 1) == 1)){
+                chk2 = false;
+                break;
+            }
+        }
+
+        return chk2;
+    }
+
+    public static void print2(long n, long c){
+        ArrayList<Long> list = new Pollard_rho().factorize(n);
+        long[] ans = { 0, 0 };
+        long cnt = 1;
+
+        for (long i : list){
+            if (i == 2 || i % 4 == 1){
+                long[] tp = p2p(i);
+
+                if (ans[0] == 0 && ans[1] == 0){
+                    ans = tp;
+                } else {
+                    long a = ans[0], b = ans[1];
+                    long p = tp[0], q = tp[1];
+                    long na = a * p + b * q, nb = Math.abs(a * q - b * p);
+                    ans[0] = na;
+                    ans[1] = nb;
+                }
+            } else {
+                cnt *= i;
+            }
+        }
+
+        cnt = (long)Math.sqrt(cnt);
+        System.out.print(((ans[0] * cnt) << c) + " " + ((ans[1] * cnt) << c));
+    }
+
+    public static void print3(long n, long c){
+        long t1 = 2;
+
+        if (n % 4 == 3) t1 = 1;
+
+        while (true){
+            long t2 = n - (t1 * t1);
+
+            if (chk2(t2)){
+                System.out.print((t1 << c) + " ");
+                print2(t2, c);
+                break;
+            }
+
+            t1 += 2;
+        }
+    }
+
+    public static void print4(long n, long c){
+        System.out.print((1 << c) + " ");
+        print3(n - 1, c);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
+        long n = in.nextLong();
+        // int k = counting(n);
+        // sb.append(k).append('\n');
+        // long[] res = null;
+
+        if ((long)Math.sqrt(n) * (long)Math.sqrt(n) == n){
+            System.out.println("1");
+            //System.out.println((long)Math.sqrt(n));
+            return;
+        }
+
+        long c4 = 0;
+
+        while (n % 4 == 0){
+            n /= 4;
+            c4++;
+        }
+
+        boolean chk2 = chk2(n);
+
+        if (chk2){
+            System.out.println("2");
+            //print2(n, c4);
+        } else if (n % 8 != 7){
+            System.out.println("3");
+            //print3(n, c4);
+        } else {
+            System.out.println("4");
+            //print4(n, c4);
+        }
+
+        // if (k == 1){
+        //     res = get1(n);
+        // } else if (k == 2){
+        //     res = get2(n);
+        // } else if (k == 3){
+        //     res = get3(n);
+        // } else if (k == 4){
+        //     res = get4(n);
+        // }
+
+        // Arrays.sort(res);
+
+        // for (long x : res){
+        //     sb.append(x).append(' ');
+        // }
+
+        // System.out.println(sb);
     }
 }
 
