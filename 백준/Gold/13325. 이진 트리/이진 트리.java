@@ -21,12 +21,6 @@ public class Main {
         return res;
     }
 
-    public static int dfs(int cur){
-        if (cur >= leaf) return tree[cur];
-
-        return tree[cur] + Math.max(dfs(cur << 1), dfs(cur << 1 | 1));
-    }
-
     public static int dp(int cur){
         if (cur >= leaf) return dp[cur] = tree[cur];
 
@@ -54,7 +48,6 @@ public class Main {
             tree[i] = in.nextInt();
         }
 
-        int max = dfs(1);
         dp(1);
 
         System.out.println(dp[1]);
