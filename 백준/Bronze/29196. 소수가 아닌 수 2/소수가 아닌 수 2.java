@@ -11,19 +11,13 @@ public class Main {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        String k = in.nextString();
+        double k = in.nextDouble();
         double p = 1;
-        double q = 2;
+        double q = 1;
 
-        jump : while (true){
-            for (int i = 1; i < q; i++){
-                if (k.equals(String.valueOf(Math.floor(i / q * 1_000_000) / 1_000_000))){
-                    p = i;
-                    break jump;
-                }
-            }
-
-            q++;
+        while (Math.abs(p / q - k) > 1e-6){
+            if (p / q > k) q++;
+            else if (p / q < k) p++;
         }
 
         System.out.println("YES");
