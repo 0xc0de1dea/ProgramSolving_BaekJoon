@@ -1,5 +1,3 @@
-import java.util.HashMap;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
@@ -7,17 +5,15 @@ import java.util.HashMap;
 
 public class Main {
     static int p, q, x, y;
-    static HashMap<Long, Long> dp = new HashMap<>();
+    static long[] dp;
+    static final int MAX = 1_000_000;
 
     public static long dp(long n){
         if (n <= 0) return 1;
 
-        if (dp.containsKey(n)) return dp.get(n);
+        if (n <= MAX) return dp[(int)n];
 
-        long res = dp(n / p - x) + dp(n / q - y);
-        dp.put(n, res);
-
-        return res;
+        return dp(n / p - x) + dp(n / q - y);
     }
 
     public static void main(String[] args) throws Exception {
@@ -30,8 +26,25 @@ public class Main {
         q = in.nextInt();
         x = in.nextInt();
         y = in.nextInt();
+        dp = new long[MAX + 1];
+        dp[0] = 1;
+
+        for (int i = 1; i <= MAX; i++){
+            int factorX = i / p - x;
+            int factorY = i / q - y;
+
+            if (factorX <= 0) dp[i]++;
+            else dp[i] += dp[i / p - x];
+
+            if (factorY <= 0) dp[i]++;
+            else dp[i] += dp[i / q - y];
+        }
         
-        System.out.println(dp(n));
+        if (n <= MAX){
+            System.out.println(dp[(int)n]);
+        } else {
+            System.out.println(dp(n));
+        }
     }
 }
 
