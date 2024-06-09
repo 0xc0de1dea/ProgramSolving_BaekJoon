@@ -6,7 +6,7 @@
 public class Main {
     static int p, q, x, y;
     static long[] dp;
-    static final int MAX = 1_000_000;
+    static final int MAX = 10_000_000;
 
     public static long dp(long n){
         if (n <= 0) return 1;
