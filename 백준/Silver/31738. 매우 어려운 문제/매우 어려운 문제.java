@@ -10,26 +10,37 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         long n = in.nextLong();
-        int m = in.nextInt();
-        long[] f = new long[m + 1];
-        f[0] = 1;
+        long m = in.nextLong();
+        long[] f = { 1, 1, 1, 1 };
+        long g = 1;
 
-        int p = m;
-
-        for (int i = 1; i <= m; i++){
-            f[i] = (f[i - 1] * i) % m;
-            
-            if (f[i] == 0){
-                p = i;
-                break;
-            }
+        if (n >= m){
+            System.out.println(0);
+            return;
         }
 
-        if (n >= p){
-            System.out.print(0);
-        } else {
-            System.out.print(f[(int)n]);
+        long x = (n & ~3) + 1;
+
+        for (long i = 1; i < x; i += 4){
+            f[0] %= m;
+            f[1] %= m;
+            f[2] %= m;
+            f[3] %= m;
+            f[0] *= i;
+            f[1] *= i + 1;
+            f[2] *= i + 2;
+            f[3] *= i + 3;
         }
+
+        for (int i = 0; i < 4; i++){
+            g = f[i] % m * g % m;
+        }
+
+        for (long i = x; i <= n; i++){
+            g = g * i % m;
+        }
+
+        System.out.println(g);
     }
 }
 
