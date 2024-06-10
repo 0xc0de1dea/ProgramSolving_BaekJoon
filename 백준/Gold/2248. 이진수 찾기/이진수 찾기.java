@@ -18,6 +18,8 @@ public class Main {
     }
 
     public static long get(int n, int l){
+        if (n == 0) return 1;
+
         long sum = 0;
 
         for (int i = 1; i <= n; i++){
@@ -40,7 +42,7 @@ public class Main {
             return;
         }
 
-        long pivot = getBinCnt(n - 1, l);
+        long pivot = get(n - 1, l);
 
         if (pivot >= i){
             ans.append(0);
@@ -62,21 +64,21 @@ public class Main {
 
         dp = new long[32][32];
 
-        for (int i = 0; i <= 31; i++){
-            for (int j = 0; j <= 31; j++){
-                dp[i][j] = -1;
-            }
-        }
-
-        // dp[1][0] = dp[1][1] = 1;
-
-        // for (int i = 2; i <= 31; i++){
-        //     for (int j = 1; j <= 31; j++){
-        //         for (int k = 1; k < i; k++){
-        //             dp[i][j] += dp[k][j - 1];
-        //         }
+        // for (int i = 0; i <= 31; i++){
+        //     for (int j = 0; j <= 31; j++){
+        //         dp[i][j] = -1;
         //     }
         // }
+
+        dp[1][0] = dp[1][1] = 1;
+
+        for (int i = 2; i <= 31; i++){
+            for (int j = 1; j <= 31; j++){
+                for (int k = 1; k < i; k++){
+                    dp[i][j] += dp[k][j - 1];
+                }
+            }
+        }
 
         find(N, L, I);
 
