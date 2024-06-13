@@ -14,7 +14,7 @@ public class Main {
 
     public static void dp(int r, int c, int idx, String word){
         if (idx >= 5) return;
-        
+
         dp.put(word, dp.getOrDefault(word, 0) + 1);
 
         for (int i = 0; i < 8; i++){
@@ -47,7 +47,13 @@ public class Main {
         }
 
         for (int i = 0; i < k; i++){
-            sb.append(dp.get(in.nextString())).append('\n');
+            String word = in.nextString();
+
+            if (dp.containsKey(word)){
+                sb.append(dp.get(word)).append('\n');
+            } else {
+                sb.append(0).append('\n');
+            }
         }
 
         System.out.print(sb);
