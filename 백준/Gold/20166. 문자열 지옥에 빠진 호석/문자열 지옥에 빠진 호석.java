@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
@@ -6,31 +8,20 @@
 public class Main {
     static int n, m, k;
     static char[][] map;
-    static int[][][] dp;
+    static HashMap<String, Integer> dp = new HashMap<>();
     static int[] dr = { -1, 0, 1, 1, 1, 0, -1, -1 };
     static int[] dc = { 1, 1, 1, 0, -1, -1, -1, 0 };
 
-    public static int dp(int r, int c, int cur, int idx, String word, String target){
-        if (cur == target.length()){
-            if (word.equals(target)){
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-        if (dp[r][c][cur] != -1) return dp[r][c][cur];
-
-        int sum = 0;
+    public static void dp(int r, int c, int idx, String word){
+        if (idx >= 5) return;
+        
+        dp.put(word, dp.getOrDefault(word, 0) + 1);
 
         for (int i = 0; i < 8; i++){
             int nr = (r + dr[i] + n) % n;
             int nc = (c + dc[i] + m) % m;
-
-            sum += dp(nr, nc, cur + 1, idx, word + map[nr][nc], target);
+            dp(nr, nc, idx + 1, word + map[nr][nc]);
         }
-
-        return dp[r][c][cur] = sum;
     }
 
     public static void main(String[] args) throws Exception {
@@ -49,32 +40,14 @@ public class Main {
             }
         }
 
-        String[] god = new String[k];
-
-        for (int i = 0; i < k; i++){
-            god[i] = in.nextString();
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < m; j++){
+                dp(i, j, 0, "" + map[i][j]);
+            }
         }
 
         for (int i = 0; i < k; i++){
-            int sum = 0;
-
-            for (int j = 0; j < n; j++){
-                for (int l = 0; l < m; l++){
-                    dp = new int[n][m][6];
-
-                    for (int p = 0; p < n; p++){
-                        for (int q = 0; q < m; q++){
-                            for (int r = 0; r < 6; r++){
-                                dp[p][q][r] = -1;
-                            }
-                        }
-                    }
-
-                    sum += dp(j, l, 1, i, "" + map[j][l], god[i]);
-                }
-            }
-
-            sb.append(sum).append('\n');
+            sb.append(dp.get(in.nextString())).append('\n');
         }
 
         System.out.print(sb);
