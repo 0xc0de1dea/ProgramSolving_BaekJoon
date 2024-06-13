@@ -12,22 +12,16 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        int[] marble = new int[n];
-        long sum = 0;
+        long min = 0x7f7f7f7f;
+        long max = 0;
 
         for (int i = 0; i < n; i++){
-            marble[i] = in.nextInt();
+            int marble = in.nextInt();
+            min = Math.min(min, marble);
+            max = Math.max(max, marble);
         }
 
-        Arrays.sort(marble);
-
-        for (int i = 1; i < n; i++){
-            sum += Math.abs(marble[i] - marble[i - 1]);
-        }
-
-        sum += Math.abs(marble[0] - marble[n - 1]);
-
-        System.out.println(sum);
+        System.out.println((max - min) << 1);
     }
 }
 
