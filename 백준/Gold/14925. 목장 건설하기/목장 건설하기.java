@@ -19,7 +19,7 @@ public class Main {
                 int e = in.nextInt();
 
                 if (e == 0) {
-                    dp[i][j] = Math.max(1, Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1])) + 1);
+                    dp[i][j] = Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1])) + 1;
                     max = Math.max(max, dp[i][j]);
                 }
             }
