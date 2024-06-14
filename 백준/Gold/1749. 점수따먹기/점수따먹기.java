@@ -11,22 +11,24 @@ public class Main {
 
         int n = in.nextInt();
         int m = in.nextInt();
-        int[][] suffixSum = new int[n + 1][m + 1];
+        int[][] prefixSum = new int[n + 1][m + 1];
 
         for (int i = 1; i <= n; i++){
             for (int j = 1; j <= m; j++){
-                suffixSum[i][j] = in.nextInt() + suffixSum[i - 1][j] + suffixSum[i][j - 1] - suffixSum[i - 1][j - 1];
+                prefixSum[i][j] = in.nextInt() + prefixSum[i - 1][j] + prefixSum[i][j - 1] - prefixSum[i - 1][j - 1];
             }
         }
 
         int max = -0x7f7f7f7f;
 
         for (int i = 1; i <= n; i++){
-            for (int j = 1; j <= m; j++){
-                for (int p = i; p <= n; p++){
-                    for (int q = j; q <= m; q++){
-                        max = Math.max(max, suffixSum[p][q] - suffixSum[p][j - 1] - suffixSum[i - 1][q] + suffixSum[i - 1][j - 1]);
-                    }
+            for (int j = i; j <= n; j++){
+                int subMax = 0;
+
+                for (int k = 1; k <= m; k++){
+                    int sum = prefixSum[j][k] - prefixSum[j][k - 1] - prefixSum[i - 1][k] + prefixSum[i - 1][k - 1];
+                    subMax = Math.max(subMax + sum, sum);
+                    max = Math.max(max, subMax);
                 }
             }
         }
