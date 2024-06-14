@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
@@ -19,46 +21,40 @@ public class Main {
 
         dp[idx][b][c][counting[1]][counting[2]] = true;
 
-        ans[idx] = 'A';
-
         if (counting[0] > 0){
             counting[0]--;
+            boolean res = dp(idx + 1, b - 1, c - 1);
+            counting[0]++;
 
-            if (dp(idx + 1, b - 1, c - 1)){
-                counting[0]++;
+            if (res){
+                ans[idx] = 'A';
                 return true;
             }
-
-            counting[0]++;
         }
-
-        ans[idx] = 'B';
-
+        
         if (b <= 0){
             if (counting[1] > 0){
                 counting[1]--;
-
-                if (dp(idx + 1, 1, c - 1)){
-                    counting[1]++;
+                boolean res = dp(idx + 1, 1, c - 1);
+                counting[1]++;
+                
+                if (res){
+                    ans[idx] = 'B';
                     return true;
                 }
-
-                counting[1]++;
             }
         }
-
-        ans[idx] = 'C';
-
+        
         if (c <= 0){
             if (counting[2] > 0){
                 counting[2]--;
+                boolean res = dp(idx + 1, b - 1, 2);
+                counting[2]++;
 
-                if (dp(idx + 1, b - 1, 2)){
-                    counting[2]++;
+                if (res){
+                    ans[idx] = 'C';
                     return true;
                 }
-
-                counting[2]++;
             }
         }
 
@@ -78,6 +74,18 @@ public class Main {
         for (int i = 0; i < seq.length; i++){
             counting[seq[i] - 'A']++;
         }
+
+        // for (int i = 0; i < 51; i++){
+        //     for (int j = 0; j < 2; j++){
+        //         for (int k = 0; k < 3; k++){
+        //             for (int p = 0; p < 51; p++){
+        //                 for (int q = 0; q < 51; q++){
+        //                     dp[i][j][k][p][q] = -1;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         boolean res = dp(0, 0, 0);
         
