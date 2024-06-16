@@ -5,7 +5,7 @@
 
 public class Main {
     static int n;
-    static long[][][][] dp;
+    static long[][][] dp;
 
     public static long nCr(int n, int r){
         long res = 1;
@@ -21,7 +21,7 @@ public class Main {
     public static long dp(int level, int r, int b, int g){
         if (level > n) return 1;
 
-        if (dp[level][r][b][g] != -1) return dp[level][r][b][g];
+        if (dp[r][b][g] != -1) return dp[r][b][g];
 
         long sum = 0;
 
@@ -46,7 +46,7 @@ public class Main {
             }
         }
 
-        return dp[level][r][b][g] = sum;
+        return dp[r][b][g] = sum;
     }
 
     public static void main(String[] args) throws Exception {
@@ -58,14 +58,12 @@ public class Main {
         int red = in.nextInt();
         int blue = in.nextInt();
         int green = in.nextInt();
-        dp = new long[11][101][101][101];
+        dp = new long[101][101][101];
 
-        for (int i = 0; i < 11; i++){
-            for (int j = 0; j < 101; j++){
-                for (int k = 0; k < 101; k++){
-                    for (int l = 0; l < 101; l++){
-                        dp[i][j][k][l] = -1;
-                    }
+        for (int j = 0; j < 101; j++){
+            for (int k = 0; k < 101; k++){
+                for (int l = 0; l < 101; l++){
+                    dp[j][k][l] = -1;
                 }
             }
         }
