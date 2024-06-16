@@ -24,7 +24,7 @@ public class Main {
 
         long cnt = 0;
 
-        for (int i = 0; i <= n - 2; i++){
+        for (int i = 0; i <= n - 1; i++){
             for (int j = 1; j <= n; j++){
                 if (prefixSum[j + i] - prefixSum[j - 1] < 0){
                     cnt += Math.ceil(Math.abs(prefixSum[j + i] - prefixSum[j - 1]) / (double)prefixSum[n]);
