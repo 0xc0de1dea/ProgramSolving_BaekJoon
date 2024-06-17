@@ -1,47 +1,47 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-import java.util.Stack;
-
 public class Main {
+
     public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
         int n = in.nextInt();
-        Stack<Integer>[] stacks = new Stack[4];
+        Deque<Integer>[] deque = new Deque[4];
 
         for (int i = 0; i < 4; i++){
-            stacks[i] = new Stack<>();
+            deque[i] = new ArrayDeque<>();
+            deque[i].push(0);
         }
+
+        boolean flag = true;
+        
         for (int i = 0; i < n; i++){
-            int element = in.nextInt();
-            boolean flag = false;
+            int a = in.nextInt();
+            boolean chk = false;
 
             for (int j = 0; j < 4; j++){
-                if (stacks[j].isEmpty()){
-                    stacks[j].push(element);
-                    flag = true;
+                if (a > deque[j].peek()){
+                    deque[j].push(a);
+                    chk = true;
                     break;
-                } else {
-                    int data = stacks[j].peek();
-
-                    if (data < element){
-                        stacks[j].push(element);
-                        flag = true;
-                        break;
-                    }
                 }
             }
 
-            if (!flag){
-                System.out.print("NO");
-                return;
+            if (!chk){
+                flag = false;
+                break;
             }
         }
 
-        System.out.print("YES");
+        if (flag) System.out.println("YES");
+        else System.out.println("NO");
     }
 }
 
@@ -61,7 +61,7 @@ class Reader {
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        while ((c = read()) <= 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
