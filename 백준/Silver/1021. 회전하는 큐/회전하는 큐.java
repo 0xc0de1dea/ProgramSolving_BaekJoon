@@ -1,42 +1,45 @@
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-import java.util.Deque;
-import java.util.LinkedList;
-
 public class Main {
     public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
         int n = in.nextInt();
         int m = in.nextInt();
-        Deque<Integer> deque = new LinkedList<>();
-        int totCnt = 0;
+        int[] seq = new int[n];
 
-        for (int i = 1; i <= n; i++){
-            deque.addLast(i);
-        }
+        for (int i = 0; i < n; i++) seq[i] = i + 1;
 
+        int min = 0;
+        int len = n;
+        int ptr = 0;
+
+        // 뽑아내려는 M개의 수의 이동 최소값은
+        // 각각의 뽑아내려는 수의 이동 최소값의 합과 같다.
+        // 배열의 길이는 매 순간마다 어떤 수를 뽑아내든 n->n-1->n-2->...1 의 길이를 보장하고
+        // 뽑아낸 수로부터 다시 출발을 하기 때문이다.
         for (int i = 0; i < m; i++){
-            int element = in.nextInt();
-            int minCnt = 0;
+            int num = in.nextInt();
+            int cnt = 0;
 
-            while (true){
-                int data = deque.pollFirst();
-
-                if (data == element){
-                    totCnt += Math.min(minCnt, deque.size() + 1 - minCnt);
-                    break;
-                } else {
-                    deque.addLast(data);
-                    minCnt++;
-                }
+            while (seq[ptr] != num){
+                ptr = (ptr + 1) % n;
+                if (seq[ptr] != 0) cnt++;
             }
+
+            seq[ptr] = 0;
+            while (seq[ptr] == 0 && len > 1) ptr = (ptr + 1) % n;
+            min += Math.min(len - cnt, cnt);
+            len--;
         }
 
-        System.out.print(totCnt);
+        System.out.println(min);
     }
 }
 
@@ -56,7 +59,7 @@ class Reader {
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        while ((c = read()) <= 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
