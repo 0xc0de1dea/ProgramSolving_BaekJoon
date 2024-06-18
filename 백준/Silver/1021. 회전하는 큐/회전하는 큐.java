@@ -10,6 +10,7 @@ public class Main {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
+        // 배열을 이용한 풀이
         int n = in.nextInt();
         int m = in.nextInt();
         int[] seq = new int[n];
@@ -28,18 +29,19 @@ public class Main {
             int num = in.nextInt();
             int cnt = 0;
 
+            // 현재 포인터가 num와 일치할 때까지 회전
             while (seq[ptr] != num){
                 ptr = (ptr + 1) % n;
                 if (seq[ptr] != 0) cnt++;
             }
 
-            seq[ptr] = 0;
-            while (seq[ptr] == 0 && len > 1) ptr = (ptr + 1) % n;
-            min += Math.min(len - cnt, cnt);
-            len--;
+            seq[ptr] = 0; // 현재값을 0으로 만들고(삭제하고)
+            while (seq[ptr] == 0 && len > 1) ptr = (ptr + 1) % n; // 삭제하지 않은 수가 나올 때 까지 포인터 이동
+            min += Math.min(len - cnt, cnt); // 왼쪽으로 회전(cnt), 오른쪽으로 회전(len - cnt) 중 최소인 값
+            len--; // 배열 길이 감소
         }
 
-        System.out.println(min);
+        System.out.print(min);
     }
 }
 
