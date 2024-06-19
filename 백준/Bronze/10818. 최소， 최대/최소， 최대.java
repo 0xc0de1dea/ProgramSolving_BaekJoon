@@ -1,3 +1,6 @@
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
@@ -5,17 +8,26 @@
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        // int n = in.nextInt();
+        // int[] arr = new int[n];
+        
+        // for (int i = 0; i < n; i++) arr[i] = in.nextInt();
+
+        // System.out.print(Arrays.stream(arr).min().getAsInt() + " " + Arrays.stream(arr).max().getAsInt());
+        // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        final int INF = 0x7f7f7f7f;
         int n = in.nextInt();
-        int[] arr = new int[n];
-        int min = 1_000_001;
-        int max = -1_000_001;
+        int min = INF;
+        int max = ~INF + 1;
 
         for (int i = 0; i < n; i++){
-            arr[i] = in.nextInt();
-            min = Math.min(min, arr[i]);
-            max = Math.max(max, arr[i]);
+            int num = in.nextInt();
+            min = Math.min(min, num);
+            max = Math.max(max, num);
         }
 
         System.out.printf("%d %d", min, max);
@@ -32,13 +44,13 @@ class Reader {
         byte c;
         while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        while ((c = read()) <= 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
