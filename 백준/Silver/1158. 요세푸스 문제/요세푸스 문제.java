@@ -1,31 +1,75 @@
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-public class Main {
-    public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
-        Reader in = new Reader();
-        int n = in.nextInt();
-        int k = in.nextInt();
-        List<Integer> list = IntStream.range(1, n + 1).boxed().collect(Collectors.toList());
+ class SegmentTree {
+    final int SIZE = 1 << 13;
+    int[] tree = new int[SIZE << 1];
 
-        int ptr = k - 1;
-        StringBuilder sb = new StringBuilder();
-        sb.append('<');
+    public SegmentTree(){ }
 
-        for (int i = 0; i < n - 1; i++){
-            sb.append(list.remove(ptr)).append(", ");
-            ptr += (k - 1);
-            ptr %= list.size();
+    public SegmentTree(int[] data){
+        int len = data.length;
+
+        for (int i = 0; i < len; i++){
+            tree[i | SIZE] = data[i];
         }
 
-        sb.append(list.remove(0)).append('>');
+        optimization();
+    }
+
+    void optimization(){
+        for (int i = SIZE - 1; i > 0; i--){
+            tree[i] = tree[i << 1] + tree[i << 1 | 1];
+        }
+    }
+
+    public int query(int idx){
+        return query(0, SIZE - 1, 1, idx);
+    }
+
+    int query(int s, int e, int node, int idx){
+        tree[node]--;
+        
+        if (s == e) return s;
+
+        int m = s + e >> 1;
+
+        if (idx > tree[node << 1]) return query(m + 1, e, node << 1 | 1, idx - tree[node << 1]);
+        else return query(s, m, node << 1, idx);
+    }
+}
+
+public class Main {
+    public static void main(String args[]) throws Exception {
+        //System.setIn(new java.io.FileInputStream("input.in"));
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+        
+        int n = in.nextInt();
+        int k = in.nextInt();
+        int[] arr = new int[n];
+
+        for (int i = 0; i < n; i++) arr[i] = 1;
+
+        // 배열, 리스트 풀이 -> erase로 인해 O(n^2)
+        // 세그먼트 트리 풀이 -> 트리관리로 인해 O(n log k)
+        SegmentTree segTree = new SegmentTree(arr);
+        int idx = k - 1;
+        sb.append("<");
+        
+        for (int i = 1; i <= n; i++){
+            int getIdx = segTree.query(idx + 1) + 1;
+
+            if (i != n) sb.append(getIdx).append(", ");
+            else sb.append(getIdx);
+
+            idx += k - 1;
+            idx %= segTree.tree[1] != 0 ? segTree.tree[1] : 1;
+        }
+
+        sb.append(">");
         System.out.print(sb);
     }
 }
@@ -40,13 +84,13 @@ class Reader {
         byte c;
         while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        while ((c = read()) > 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        while ((c = read()) <= 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
