@@ -32,29 +32,32 @@ public class Main {
             hm.put(memo[i], i + 1);
         }
 
-        // int cnt = 1;
-        // int idx = 0;
-        // final int MAX = memo.length;
-        // final int MOD = 900_528;
-
-        // while (idx < cypher.length){
-        //     int num = hm.get(cypher[idx]);
-        //     cnt *= 
-        // }
-
-        int cnt = 0;
-        int idx = cypher.length - 1;
-        long digit = 0;
-        final long MAX = memo.length;
+        int cnt = hm.get(cypher[0]);
+        int idx = 1;
+        final int MAX = memo.length;
         final int MOD = 900_528;
 
-        while (idx >= 0){
+        while (idx < cypher.length){
             int num = hm.get(cypher[idx]);
-            cnt += (pow(MAX, digit, MOD) * num) % MOD;
+            cnt *= MAX;
+            cnt += num;
             cnt %= MOD;
-            digit++;
-            idx--;
+            idx++;
         }
+
+        // int cnt = 0;
+        // int idx = cypher.length - 1;
+        // long digit = 0;
+        // final long MAX = memo.length;
+        // final int MOD = 900_528;
+
+        // while (idx >= 0){
+        //     int num = hm.get(cypher[idx]);
+        //     cnt += (pow(MAX, digit, MOD) * num) % MOD;
+        //     cnt %= MOD;
+        //     digit++;
+        //     idx--;
+        // }
 
         System.out.println(cnt);
     }
