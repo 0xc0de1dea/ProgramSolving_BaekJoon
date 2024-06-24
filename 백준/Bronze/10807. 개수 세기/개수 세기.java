@@ -7,23 +7,19 @@ public class Main {
     public static void main(String[] args) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
         int n = in.nextInt();
-        int[] arr = new int[n];
+        int[] counting = new int[201];
 
         for (int i = 0; i < n; i++){
-            arr[i] = in.nextInt();
+            int num = in.nextInt();
+            counting[num + 100]++;
         }
 
         int v = in.nextInt();
-        int cnt = 0;
 
-        for (int item : arr){
-            if (v == item){
-                cnt++;
-            }
-        }
-
-        System.out.println(cnt);
+        System.out.print(counting[v + 100]);
     }
 }
 
@@ -43,7 +39,7 @@ class Reader {
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        while ((c = read()) <= 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
