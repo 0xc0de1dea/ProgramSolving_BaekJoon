@@ -35,7 +35,7 @@ public class Main {
         priority.put('-', 1);
         priority.put('*', 2);
         priority.put('/', 2);
-        priority.put('(', 3);
+        priority.put('(', 0);
 
         Deque<Character> stack = new ArrayDeque<>();
 
@@ -46,10 +46,8 @@ public class Main {
                 postfix.append(c);
             } else {
                 if (c == '+' || c == '-' || c == '*' || c == '/'){
-                    if (!stack.isEmpty() && stack.peek() != '('){
-                        while (!stack.isEmpty() && stack.peek() != '(' && priority.get(stack.peek()) >= priority.get(c)){
-                            postfix.append(stack.pop());
-                        }
+                    while (!stack.isEmpty() && priority.get(stack.peek()) >= priority.get(c)){
+                        postfix.append(stack.pop());
                     }
                 } else if (c == ')'){
                     while (stack.peek() != '('){
