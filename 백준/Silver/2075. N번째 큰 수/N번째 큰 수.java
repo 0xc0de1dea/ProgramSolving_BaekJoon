@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.PriorityQueue;
 
 /**
  * Written by 0xc0de1dea
@@ -13,17 +12,15 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        ArrayList<Integer> list = new ArrayList<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>((x, y) -> x - y);
 
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < n; j++){
-                list.add(in.nextInt());
-            }
+        for (int i = 0; i < n * n; i++){
+            pq.add(in.nextInt());
+
+            if (pq.size() > n) pq.poll();
         }
 
-        Collections.sort(list);
-
-        System.out.println(list.get(n * n - n));
+        System.out.println(pq.poll());
     }
 }
 
