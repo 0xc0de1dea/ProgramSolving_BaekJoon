@@ -10,7 +10,7 @@ public class Main {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        char[] letter = new char[2001];
+        char[] letter = new char[200001];
         byte c;
         int n = 0;
         
