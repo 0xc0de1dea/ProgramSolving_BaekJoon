@@ -4,29 +4,25 @@
  */
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] argu) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
         int k = in.nextInt();
-        int[][] dp = new int[n + 1][k + 1];
+        int[] dp = new int[100_001];
 
-        for (int i = 1; i <= n; i++){
+        for (int i = 0; i < n; i++){
             int w = in.nextInt();
             int v = in.nextInt();
 
-            for (int j = 1; j <= k; j++){
-                dp[i][j] = dp[i - 1][j];
-
-                if (w <= j){
-                    dp[i][j] = Math.max(dp[i][j], dp[i - 1][j - w] + v);
-                }
+            for (int j = k; j >= w; j--){
+                dp[j] = Math.max(dp[j], dp[j - w] + v);
             }
         }
 
-        System.out.print(dp[n][k]);
+        System.out.println(dp[k]);
     }
 }
 
