@@ -7,39 +7,27 @@ public class Main {
     static int R, C;
     static char[][] map;
 
-    public static int backtracking(int r, int c){
+    public static int dfs(int r, int c){
         if (c == C - 1) return 1;
 
         int res = 0;
-        //print(r, c);
 
         if (r - 1 >= 0 && map[r - 1][c + 1] == '.'){
             map[r - 1][c + 1] = 'x';
-            res = backtracking(r - 1, c + 1);
+            res = dfs(r - 1, c + 1);
         }
         
         if (map[r][c + 1] == '.' && res == 0){
             map[r][c + 1] = 'x';
-            res = backtracking(r, c + 1);
+            res = dfs(r, c + 1);
         }
         
         if (r + 1 < R && map[r + 1][c + 1] == '.' && res == 0){
             map[r + 1][c + 1] = 'x';
-            res = backtracking(r + 1, c + 1);
+            res = dfs(r + 1, c + 1);
         }
 
         return res;
-    }
-
-    public static void print(int r, int c){
-        System.out.println(r + " " + c);
-        for (int i = 0; i < R; i++){
-            for (int j = 0; j < C; j++){
-                System.out.print(map[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 
     public static void main(String[] argu) throws Exception {
@@ -60,7 +48,7 @@ public class Main {
         int cnt = 0;
 
         for (int i = 0; i < R; i++){
-            cnt += backtracking(i, 0);
+            cnt += dfs(i, 0);
         }
 
         System.out.println(cnt);
