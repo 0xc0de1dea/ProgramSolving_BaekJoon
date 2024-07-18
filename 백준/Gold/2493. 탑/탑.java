@@ -29,16 +29,11 @@ public class Main {
         for (int i = 1; i <= n; i++){
             int cur = in.nextInt();
             
-            while (!stack.isEmpty() && stack.peek().height <= cur){
+            while (stack.peek().height <= cur){
                 stack.pop();
             }
 
-            if (!stack.isEmpty() && stack.peek().height > cur){
-                sb.append(stack.peek().idx).append(' ');
-            } else {
-                sb.append(0).append(' ');
-            }
-
+            sb.append(stack.peek().idx).append(' ');
             stack.push(new Tower(cur, i));
         }
 
