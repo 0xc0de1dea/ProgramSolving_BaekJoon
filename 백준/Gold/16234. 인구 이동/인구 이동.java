@@ -57,16 +57,6 @@ public class Main {
         visited[id] = sum / cnt;
     }
 
-    public static void print(){
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < n; j++){
-                System.out.printf("%4d", country[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
     public static void main(String[] argu) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
@@ -108,7 +98,6 @@ public class Main {
                 }
             }
 
-           // print();
             time++;
         }
 
