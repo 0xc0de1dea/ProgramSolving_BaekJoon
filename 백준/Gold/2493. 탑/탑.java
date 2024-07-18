@@ -24,26 +24,22 @@ public class Main {
 
         int n = in.nextInt();
         Deque<Tower> stack = new ArrayDeque<>();
+        stack.push(new Tower(0x7f7f7f7f, 0));
 
         for (int i = 1; i <= n; i++){
             int cur = in.nextInt();
             
-            if (stack.isEmpty()){
-                stack.push(new Tower(cur, i));
-                sb.append(0).append(' ');
-            } else {
-                while (!stack.isEmpty() && stack.peek().height <= cur){
-                    stack.pop();
-                }
-
-                if (!stack.isEmpty() && stack.peek().height > cur){
-                    sb.append(stack.peek().idx).append(' ');
-                } else {
-                    sb.append(0).append(' ');
-                }
-
-                stack.push(new Tower(cur, i));
+            while (!stack.isEmpty() && stack.peek().height <= cur){
+                stack.pop();
             }
+
+            if (!stack.isEmpty() && stack.peek().height > cur){
+                sb.append(stack.peek().idx).append(' ');
+            } else {
+                sb.append(0).append(' ');
+            }
+
+            stack.push(new Tower(cur, i));
         }
 
         System.out.print(sb);
