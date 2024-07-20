@@ -19,37 +19,6 @@ class Dice {
         }
     }
 
-    boolean[] choiced = new boolean[6];
-
-    public int choice(int depth, int cnt, int trg){
-        if (cnt > trg || depth >= 6) return 0;
-
-        if (cnt == trg) {
-            int sum = 0;
-
-            for (int i = 0; i < 6; i++){
-                if (choiced[i]){
-                    sum += nums[i];
-                }
-            }
-
-            return sum;
-        }
-
-        int max = 0;
-
-        choiced[depth] = true;
-        max = Math.max(max, choice(depth + 1, cnt + 1, trg));
-        choiced[depth] = false;
-        max = Math.max(max, choice(depth + 1, cnt, trg));
-
-        return max;
-    }
-
-    public int getMaxSumSide(int n){
-        return choice(0, 0, n);
-    }
-
     public int getSumFiveSide(){
         int[][] list = {
             { 1, 2, 3, 4, 5 },
@@ -157,15 +126,11 @@ public class Main {
 
         if (n == 1){
             System.out.println(dice.getSumFiveSide());
-        } else if (n == 2){
-            System.out.println(dice.getSumThreeSide() * 4 + dice.getSumTwoSide() * 4);
-        } else if (n >= 3){
+        } else {
             long sum = 0;
             sum += dice.getSumThreeSide() * 4;
-            sum += dice.getSumTwoSide() * 4;
-            sum += dice.getSumOneSide() * (n - 2) * 4;
-            sum += dice.getSumTwoSide() * (n - 2) * 8;
-            sum += dice.getSumOneSide() * (n - 2) * (n - 2) * 5;
+            sum += dice.getSumTwoSide() * (8 * n - 12);
+            sum += dice.getSumOneSide() * (5 * n - 6) * (n - 2);
             System.out.println(sum);
         }
     }
