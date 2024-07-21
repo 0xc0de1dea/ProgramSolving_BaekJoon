@@ -8,70 +8,39 @@ import java.util.Queue;
 
 public class Main {
     static char[] map;
-    static boolean[] choice;
+    static boolean[] visit;
     static int[] dx = { 1, 5, -1, -5 };
 
-    public static int bfs(){
-        Queue<Integer> queue = new LinkedList<>();
-        boolean[] isVisited = new boolean[25];
-        
-        for (int i = 0; i < 25; i++){
-            if (choice[i]){
-                queue.add(i);
-                isVisited[i] = true;
-                break;
-            }
-        }
+    public static int bruthforce(int depth, int bit, int s, int y){
+        if (depth == 7 && s >= 4) return 1;
 
-        int cnt = 1;
-
-        while (!queue.isEmpty()){
-            int cur = queue.poll();
-
-            for (int i = 0; i < 4; i++){
-                int nxt = cur + dx[i];
-
-                if (0 <= nxt && nxt < 25){
-                    if (i == 0 || i == 2){
-                        if (nxt / 5 != cur / 5){
-                            continue;
-                        }
-                    }
-
-                    if (!isVisited[nxt] && choice[nxt]){
-                        isVisited[nxt] = true;
-                        queue.add(nxt);
-                        cnt++;
-                    }
-                }
-            }
-        }
-
-        return cnt == 7 ? 1 : 0;
-    }
-
-    public static int permutation(int depth, int cur, int s, int y){
-        if (depth == 7){
-            if (s >= 4){
-                return bfs();
-            } else {
-                return 0;
-            }
-        }
+        if (y >= 4) return 0;
 
         int sum = 0;
 
-        for (int i = cur; i < 25; i++){
-            choice[i] = true;
+        for (int i = 0; i < 25; i++){
+            if ((bit & (1 << i)) > 0){
+                for (int j = 0; j < 4; j++){
+                    int nxt = i + dx[j];
 
-            if (map[i] == 'S'){
-                sum += permutation(depth + 1, i + 1, s + 1, y);
-            } else if (map[i] == 'Y'){
-                sum += permutation(depth + 1, i + 1, s, y + 1);
+                    if (0 <= nxt && nxt < 25){
+                        if (j == 0 || j == 2){
+                            if (i / 5 != nxt / 5){
+                                continue;
+                            }
+                        }
+
+                        int nBit = 1 << nxt;
+
+                        if ((bit & nBit) == 0 && !visit[bit | nBit]){
+                            visit[bit | nBit] = true;
+
+                            if (map[nxt] == 'S') sum += bruthforce(depth + 1, bit | nBit, s + 1, y);
+                            else if (map[nxt] == 'Y') sum += bruthforce(depth + 1, bit | nBit, s, y + 1);
+                        }
+                    }
+                }
             }
-
-            choice[i] = false;
-            sum += permutation(depth + 1, i + 1, s, y);
         }
 
         return sum;
@@ -83,15 +52,20 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         map = new char[25];
-        choice = new boolean[25];
+        visit = new boolean[1 << 25];
 
-        for (int i = 0; i < 5; i++){
-            for (int j = 0; j < 5; j++){
-                map[i * 5 + j] = in.nextChar();
-            }
+        for (int i = 0; i < 25; i++){
+            map[i] = in.nextChar();
         }
 
-        int sum = permutation(0, 0, 0, 0);
+        int sum = 0;
+
+        for (int i = 0; i < 25; i++){
+            if (map[i] == 'S'){
+                visit[1 << i] = true;
+                sum += bruthforce(1, 1 << i, 1, 0);
+            }
+        }
 
         System.out.println(sum);
     }
