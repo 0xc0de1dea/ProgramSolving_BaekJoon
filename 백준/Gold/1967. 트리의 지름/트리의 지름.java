@@ -1,55 +1,43 @@
+import java.util.ArrayList;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
- import java.util.ArrayList;
+class Edge {
+    int to;
+    int weight;
 
-class Tree {
-    Node[] nodes;
-    int diameter;
-
-    public Tree(int n){
-        nodes = new Node[n + 1];
-        diameter = 0;
+    public Edge(int to, int weight){
+        this.to = to;
+        this.weight = weight;
     }
+}
 
-    class Node {
-        int id;
-        int weight;
-        ArrayList<Node> children = new ArrayList<>();
+public class Main {
+    static int n;
+    static ArrayList<ArrayList<Edge>> edges = new ArrayList<>();
+    static int diameter = 0;
 
-        public Node(int id, int weight){
-            this.id = id;
-            this.weight = weight;
-        }
-
-        public void addChildren(Node node){
-            children.add(node);
-        }
-    }
-
-    public void addNode(int id, int weight){
-        Node node = new Node(id, weight);
-        nodes[id] = node;
-    }
-
-    public int postOrder(Node node){
-        int sz = node.children.size();
-
-        if (sz == 0) return 0;
-
+    public static int dfs(int cur){
+        int size = edges.get(cur).size();
         int max = 0;
-        int[] weights = new int[sz];
 
-        for (int i = 0; i < sz; i++){
-            weights[i] = postOrder(node.children.get(i)) + node.children.get(i).weight;
+        if (size == 0) return 0;
+
+        int[] weights = new int[size];
+
+        for (int i = 0; i < size; i++){
+            Edge nxt = edges.get(cur).get(i);
+            weights[i] = nxt.weight + dfs(nxt.to);
             max = Math.max(max, weights[i]);
         }
-        if (sz == 1) diameter = Math.max(diameter, weights[0]);
+
+        if (size == 1) diameter = Math.max(diameter, weights[0]);
         else {
-            for (int i = 0; i < sz - 1; i++){
-                for (int j = i + 1; j < sz; j++){
+            for (int i = 0; i < size - 1; i++){
+                for (int j = i + 1; j < size; j++){
                     diameter = Math.max(diameter, weights[i] + weights[j]);
                 }
             }
@@ -58,31 +46,28 @@ class Tree {
         return max;
     }
 
-    public int getDiameter(Node node){
-        postOrder(node);
-        return diameter;
-    }
-}
-
-public class Main {
-    public static void main(String[] argu) throws Exception {
+    public static void main(String[] args) throws Exception {
         //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        int n = in.nextInt();
-        Tree tree = new Tree(n);
+        n = in.nextInt();
 
-        for (int i = 1; i <= n; i++) tree.addNode(i, 0);
-        for (int i = 1; i < n; i++){
-            int parent = in.nextInt();
-            int child = in.nextInt();
-            int weight = in.nextInt();
-            tree.nodes[child].weight = weight;
-            tree.nodes[parent].addChildren(tree.nodes[child]);
+        for (int i = 0; i <= n; i++){
+            edges.add(new ArrayList<>());
         }
 
-        System.out.print(tree.getDiameter(tree.nodes[1]));
+        for (int i = 1; i < n; i++){
+            int from = in.nextInt();
+            int to = in.nextInt();
+            int weight = in.nextInt();
+
+            edges.get(from).add(new Edge(to, weight));
+        }
+
+        dfs(1);
+
+        System.out.println(diameter);
     }
 }
 
@@ -94,15 +79,15 @@ class Reader {
     String nextString() throws Exception {
         StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
         do sb.appendCodePoint(c);
-        while ((c = read()) > 32);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
         return sb.toString();
     }
 
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
@@ -110,7 +95,7 @@ class Reader {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -132,7 +117,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
