@@ -55,8 +55,6 @@ public class Main {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        bruthforce(0);
-
         int n = in.nextInt();
 
         if (n == 1){
