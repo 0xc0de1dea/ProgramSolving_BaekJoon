@@ -1,41 +1,42 @@
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-public class Main{
-    public static void main(String[] argu) throws Exception {
+public class Main {
+    public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        int[] stack = new int[n + 1];
-        int ptr = 0;
-        int num = 0;
+        Deque<Integer> stack = new ArrayDeque<>();
+        int cur = 1;
 
-        while (n-- > 0){
-            int v = in.nextInt();
+        boolean flag = true;
 
-            if (v > num){
-                for (int i = num + 1; i <= v; i++){
-                    stack[++ptr] = i;
-                    sb.append('+').append('\n');
-                }
+        for (int i = 0; i < n; i++){
+            int num = in.nextInt();
 
-                num = v;
-            }
-            else if (stack[ptr] != v){
-                System.out.print("NO");
-                return;
+            while (cur <= num){
+                stack.push(cur++);
+                sb.append('+').append('\n');
             }
 
-            ptr--;
-            sb.append('-').append('\n');
+            if (stack.peekFirst() == num){
+                stack.pop();
+                sb.append('-').append('\n');
+            } else {
+                flag = false;
+            }
         }
 
-        System.out.print(sb);
+        if (flag) System.out.println(sb);
+        else System.out.println("NO");
     }
 }
 
@@ -44,9 +45,18 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
     char nextChar() throws Exception {
         byte c;
-        while ((c = read()) <= 32);
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
         return (char)c;
     }
     
@@ -54,7 +64,7 @@ class Reader {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -76,7 +86,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -87,6 +97,10 @@ class Reader {
 
     boolean isNumber(byte c) {
         return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
