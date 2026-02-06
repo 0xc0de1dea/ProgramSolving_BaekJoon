@@ -1,27 +1,34 @@
+
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.util.Arrays;
-
 public class Main {
-    static public void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
         int n = in.nextInt();
-        int[] elapsedTime = new int[n];
-        for (int i = 0; i < n; i++) elapsedTime[i] = in.nextInt();
-        Arrays.sort(elapsedTime);
-        for (int i = 1; i < n; i++) elapsedTime[i] += elapsedTime[i - 1];
+        int[] time = new int[n];
 
-        int totSum = 0;
-        for (int i = 0; i < n; i++) totSum += elapsedTime[i];
+        for (int i = 0; i < n; i++){
+            time[i] = in.nextInt();
+        }
 
-        System.out.print(totSum);
+        Arrays.sort(time);
+
+        int sum = 0;
+        int min = 0;
+
+        for (int i = 0; i < time.length; i++){
+            sum = sum + time[i];
+            min += sum;
+        }
+
+        System.out.println(min);
     }
 }
 
@@ -30,20 +37,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -65,7 +78,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -79,7 +92,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
