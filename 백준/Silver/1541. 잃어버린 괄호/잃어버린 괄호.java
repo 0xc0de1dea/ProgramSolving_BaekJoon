@@ -3,36 +3,31 @@
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 public class Main {
-    static public void main(String[] args) throws Exception{
-        //Reader in = new Reader();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String[] expression = br.readLine().split("");
+    public static void main(String[] args) throws Exception {
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
 
-        int min = 0, num = 0;
+        String[] expression = in.nextString().split("");
+
+        int min = 0;
+        int num = 0;
         int flag = 1;
 
         for (int i = 0; i < expression.length; i++){
-            if (expression[i].compareTo("-") == 0){
-                min += num * flag;
+            if (expression[i].equals("+")){
+                min += flag * num;
+                num = 0;
+            } else if (expression[i].equals("-")){
+                min += flag * num;
                 flag = -1;
                 num = 0;
-                continue;
+            } else {
+                num = num * 10 + Integer.parseInt(expression[i]);
             }
-            else if (expression[i].compareTo("+") == 0){
-                min += num * flag;
-                num = 0;
-                continue;
-            }
-            num = (num << 3) + (num << 1) + Integer.parseInt(expression[i]);
         }
 
-        System.out.println(min + num * flag);
+        System.out.println(min + flag * num);
     }
 }
 
@@ -41,20 +36,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -76,7 +77,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -90,7 +91,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
