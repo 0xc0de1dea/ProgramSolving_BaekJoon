@@ -1,40 +1,36 @@
-import java.util.Arrays;
-
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
 public class Main {
-    static int n;
-    static int[][] triangle;
-    static int[][] dp;
-
-    public static int dp(int r, int c){
-        if (r > n) return 0;
-
-        if (dp[r][c] >= 0) return dp[r][c];
-
-        return dp[r][c] = triangle[r][c] + Math.max(dp(r + 1, c), dp(r + 1, c + 1));
-    }
-
     public static void main(String[] args) throws Exception {
-        //System.setIn(new java.io.FileInputStream("input.in"));
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-        
-        n = in.nextInt();
-        triangle = new int[n + 1][n + 1];
-        dp = new int[n + 1][n + 1];
+
+        int n = in.nextInt();
+        int[][] tri = new int[n + 1][n + 1];
 
         for (int i = 1; i <= n; i++){
             for (int j = 1; j <= i; j++){
-                triangle[i][j] = in.nextInt();
-                dp[i][j] = -1;
+                tri[i][j] = in.nextInt();
             }
         }
 
-        System.out.println(dp(1, 1));
+        int[][] dp = new int[n + 1][n + 1];
+        dp[1][1] = tri[1][1];
+
+        for (int i = 2; i <= n; i++){
+            for (int j = 1; j <= i; j++){
+                dp[i][j] = Math.max(dp[i - 1][j - 1], dp[i - 1][j]) + tri[i][j];
+            }
+        }
+
+        int max = 0;
+
+        for (int i = 1; i <= n; i++) max = Math.max(max, dp[n][i]);
+
+        System.out.println(max);
     }
 }
 
