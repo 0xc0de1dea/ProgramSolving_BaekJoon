@@ -1,17 +1,16 @@
+
+import java.util.Arrays;
+
 /**
  * Written by 0xc0de1dea
  * Email : 0xc0de1dea@gmail.com
  */
 
-//import java.io.FileInputStream;
-
-import java.util.Arrays;
-
 public class Main {
     static int n, c;
     static int[] house;
 
-    static int cntWifi(int dist){
+    public static int cntWifi(int dist){
         int cnt = 1;
         int prev = house[0];
 
@@ -21,37 +20,38 @@ public class Main {
                 prev = house[i];
             }
         }
-        
+
         return cnt;
     }
 
-    static int upperBound(int low, int high){
-        while (low < high){
-            int mid = low + high >> 1;
+    public static int upperbound(int s, int e){
+        while (s < e){
+            int m = s + e >> 1;
 
-            if (cntWifi(mid) < c) high = mid;
-            else low = mid + 1;
+            if (cntWifi(m) < c) e = m;
+            else s = m + 1;
         }
 
-        return low - 1;
+        return s - 1;
     }
 
-    @SuppressWarnings("unchecked")
-    static public void main(String[] args) throws Exception{
-        //System.setIn(new FileInputStream("input.in"));
+    public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-        
+
         n = in.nextInt();
         c = in.nextInt();
         house = new int[n];
 
-        for (int i = 0; i < n; i++) house[i] = in.nextInt();
+        for (int i = 0; i < n; i++){
+            house[i] = in.nextInt();
+        }
 
         Arrays.sort(house);
-        int maxDist = upperBound(1, house[n - 1] - house[0] + 1);
 
-        System.out.print(maxDist);
+        int min = upperbound(1, house[n - 1] - house[0] + 1);
+
+        System.out.println(min);
     }
 }
 
@@ -60,20 +60,26 @@ class Reader {
     byte[] buffer = new byte[SIZE];
     int index, size;
 
-    char nextChar() throws Exception {
-        char ch = ' ';
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
         byte c;
-        while ((c = read()) <= 32);
-        do ch = (char)c;
-        while (isAlphabet(c = read()));
-        return ch;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
     }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32); //{ if (size < 0) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -95,7 +101,7 @@ class Reader {
         double n = 0, div = 1;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
         if (c == 45) { c = read(); isMinus = true; }
         else if (c == 46) { c = read(); }
         do n = (n * 10) + (c & 15);
@@ -109,7 +115,7 @@ class Reader {
     }
 
     boolean isAlphabet(byte c){
-        return 96 < c && c < 123;
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
