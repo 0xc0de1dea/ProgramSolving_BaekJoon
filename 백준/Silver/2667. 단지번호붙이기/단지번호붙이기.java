@@ -1,41 +1,47 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.StringTokenizer;
+
+/**
+ * Written by 0xc0de1dea
+ * Email : 0xc0de1dea@gmail.com
+ */
 
 public class Main {
-    static int n;
-    static int[][] graph;
-    static int uniqnum = 0;
-    static ArrayList<Integer> houseSize = new ArrayList<>();
-    static int[][] dir = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+    static class Axis {
+        int x;
+        int y;
 
-    public static int bfs(int row, int col){
-        Queue<Integer> queue = new LinkedList<>();
-        queue.add((row << 5) + col);
-        graph[row][col] = uniqnum;
+        public Axis(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static int[] dx = {0, 1, 0, -1};
+    static int[] dy = {1, 0, -1, 0};
+
+    public static int bfs(int id, int[][] map, int n, int sx, int sy){
+        Queue<Axis> queue = new LinkedList<>();
+        queue.add(new Axis(sx, sy));
+        map[sx][sy] = id;
+
         int cnt = 1;
 
-        while (queue.size() != 0){
-            int cur = queue.remove();
-            int curCol = cur & 31;
-            int curRow = (cur >> 5) & 31;
+        while (!queue.isEmpty()){
+            Axis cur = queue.poll();
 
             for (int i = 0; i < 4; i++){
-                int newRow = curRow + dir[i][0];
-                int newCol = curCol + dir[i][1];
+                int nx = cur.x + dx[i];
+                int ny = cur.y + dy[i];
 
-                if (newRow < 0 || newRow >= n || newCol < 0 || newCol >= n)
-                    continue;
-
-                if (graph[newRow][newCol] == -1){
-                    queue.add((newRow << 5) + newCol);
-                    graph[newRow][newCol] = uniqnum;
-                    cnt++;
+                if (0 <= nx && nx < n && 0 <= ny && ny < n){
+                    if (map[nx][ny] == 1){
+                        map[nx][ny] = id;
+                        queue.add(new Axis(nx, ny));
+                        cnt++;
+                    }
                 }
             }
         }
@@ -43,40 +49,111 @@ public class Main {
         return cnt;
     }
 
-    public static void main(String[] argu) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws Exception {
+        Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-        n = Integer.parseInt(br.readLine());
-        graph = new int[n][n];
+
+        int n = in.nextInt();
+        int[][] map = new int[n][n];
 
         for (int i = 0; i < n; i++){
-            String[] input = br.readLine().split("");
+            char[] cArr = in.nextString().toCharArray();
 
             for (int j = 0; j < n; j++){
-                int tmp = Integer.parseInt(input[j]);
-
-                if (tmp == 0)
-                    graph[i][j] = 0;
-                else
-                    graph[i][j] = -1;
+                map[i][j] = (int)(cArr[j] - '0');
             }
         }
 
+        int id = 1;
+        ArrayList<Integer> list = new ArrayList<>();
+
         for (int i = 0; i < n; i++){
             for (int j = 0; j < n; j++){
-                if (graph[i][j] == -1){
-                    uniqnum++;
-                    houseSize.add(bfs(i, j));
+                if (map[i][j] == 1){
+                    list.add(bfs(++id, map, n, i, j));
                 }
             }
         }
 
-        sb.append(uniqnum).append('\n');
-        houseSize.sort(Comparator.naturalOrder());
+        list.sort(null);
 
-        for (int e : houseSize)
+        for (int e : list){
             sb.append(e).append('\n');
+        }
 
+        System.out.println(id - 1);
         System.out.println(sb);
+    }
+}
+
+class Reader {
+    final int SIZE = 1 << 13;
+    byte[] buffer = new byte[SIZE];
+    int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
+    }
+    
+    int nextInt() throws Exception {
+        int n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    long nextLong() throws Exception {
+        long n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    double nextDouble() throws Exception {
+        double n = 0, div = 1;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
+        if (c == 45) { c = read(); isMinus = true; }
+        else if (c == 46) { c = read(); }
+        do n = (n * 10) + (c & 15);
+        while (isNumber(c = read()));
+        if (c == 46) { while (isNumber(c = read())){ n += (c - 48) / (div *= 10); }}
+        return isMinus ? -n : n;
+    }
+
+    boolean isNumber(byte c) {
+        return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
+    }
+
+    byte read() throws Exception {
+        if (index == size) {
+            size = System.in.read(buffer, index = 0, SIZE);
+            if (size < 0) buffer[0] = -1;
+        }
+        return buffer[index++];
     }
 }
