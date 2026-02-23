@@ -1,65 +1,74 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.StringTokenizer;
+
+/**
+ * Written by 0xc0de1dea
+ * Email : 0xc0de1dea@gmail.com
+ */
 
 public class Main {
-    static int n, m, k;
-    static int[][] map;
-    static int[] dx = new int[] { 1, 0, -1, 0 };
-    static int[] dy = new int[] { 0, 1, 0, -1 };
+    static class Axis {
+        int x;
+        int y;
 
-    public static void bfs(int id, int x, int y){
-        Queue<int[]> q = new LinkedList<>();
-        q.add(new int[] { y, x });
-        map[y][x] = id;
+        public Axis(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+    }
 
-        while (!q.isEmpty()){
-            int cx = q.peek()[1];
-            int cy = q.poll()[0];
+    static int[] dx = {0, 1, 0, -1};
+    static int[] dy = {1, 0, -1, 0};
+
+    public static void bfs(int[][] map, int n, int m, int sx, int sy){
+        Queue<Axis> queue = new LinkedList<>();
+        queue.add(new Axis(sx, sy));
+        map[sx][sy] = 2;
+
+        while (!queue.isEmpty()){
+            Axis cur = queue.poll();
 
             for (int i = 0; i < 4; i++){
-                int nx = cx + dx[i];
-                int ny = cy + dy[i];
+                int nx = cur.x + dx[i];
+                int ny = cur.y + dy[i];
 
-                if (nx >= 0 && nx < m && ny >= 0 && ny < n){
-                    if (map[ny][nx] == -1){
-                        q.add(new int[] { ny, nx });
-                        map[ny][nx] = id;
+                if (0 <= nx && nx < n && 0 <= ny && ny < m){
+                    if (map[nx][ny] == 1){
+                        map[nx][ny] = 2;
+                        queue.add(new Axis(nx, ny));
                     }
                 }
             }
         }
     }
 
-    public static void main(String[] argu) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws Exception {
+        Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
 
-        int t = Integer.parseInt(br.readLine());
+        int t = in.nextInt();
 
         while (t-- > 0){
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            m = Integer.parseInt(st.nextToken());
-            n = Integer.parseInt(st.nextToken());
-            k = Integer.parseInt(st.nextToken());
-            map = new int[n][m];
+            int m = in.nextInt();
+            int n = in.nextInt();
+            int k = in.nextInt();
+
+            int[][] map = new int[n][m];
 
             for (int i = 0; i < k; i++){
-                st = new StringTokenizer(br.readLine());
-                int x = Integer.parseInt(st.nextToken());
-                int y = Integer.parseInt(st.nextToken());
-                map[y][x] = -1;
+                int x = in.nextInt();
+                int y = in.nextInt();
+                map[y][x] = 1;
             }
 
             int cnt = 0;
-            
+
             for (int i = 0; i < n; i++){
                 for (int j = 0; j < m; j++){
-                    if (map[i][j] == -1){
-                        bfs(++cnt, j, i);
+                    if (map[i][j] == 1){
+                        bfs(map, n, m, i, j);
+                        cnt++;
                     }
                 }
             }
@@ -68,5 +77,77 @@ public class Main {
         }
 
         System.out.println(sb);
+    }
+}
+
+class Reader {
+    final int SIZE = 1 << 13;
+    byte[] buffer = new byte[SIZE];
+    int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
+    }
+    
+    int nextInt() throws Exception {
+        int n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    long nextLong() throws Exception {
+        long n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    double nextDouble() throws Exception {
+        double n = 0, div = 1;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
+        if (c == 45) { c = read(); isMinus = true; }
+        else if (c == 46) { c = read(); }
+        do n = (n * 10) + (c & 15);
+        while (isNumber(c = read()));
+        if (c == 46) { while (isNumber(c = read())){ n += (c - 48) / (div *= 10); }}
+        return isMinus ? -n : n;
+    }
+
+    boolean isNumber(byte c) {
+        return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
+    }
+
+    byte read() throws Exception {
+        if (index == size) {
+            size = System.in.read(buffer, index = 0, SIZE);
+            if (size < 0) buffer[0] = -1;
+        }
+        return buffer[index++];
     }
 }
