@@ -1,78 +1,156 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.StringTokenizer;
+
+/**
+ * Written by 0xc0de1dea
+ * Email : 0xc0de1dea@gmail.com
+ */
 
 public class Main {
     static int n, m, v;
-    static ArrayList<Integer>[] graph;
+    static ArrayList<ArrayList<Integer>> edges = new ArrayList<>();
     static boolean[] isVisited;
-    static StringBuilder sb = new StringBuilder();
+    static StringBuilder res = new StringBuilder();
 
-    public static void dfs(int start){
-        isVisited[start] = true;
-        sb.append(start).append(' ');
+    public static void dfs(int src){
+        res.append(src).append(' ');
+        isVisited[src] = true;
 
-        for (int next : graph[start]){
-            if (!isVisited[next]){
-                dfs(next);
+        for (int trg : edges.get(src)){
+            if (!isVisited[trg]){
+                dfs(trg);
             }
         }
     }
 
-    public static void bfs(int start){
+    public static void bfs(){
         Queue<Integer> queue = new LinkedList<>();
-        queue.add(start);
-        isVisited[start] = true;
+        queue.add(v);
+        isVisited[v] = true;
+        res.append(v).append(' ');
 
-        while (queue.size() != 0){
-            int cur = queue.remove();
-            sb.append(cur).append(' ');
+        while (!queue.isEmpty()){
+            int src = queue.poll();
 
-            for (int next : graph[cur]){
-                if (!isVisited[next]){
-                    queue.add(next);
-                    isVisited[next] = true;
+            for (int trg : edges.get(src)){
+                if (!isVisited[trg]){
+                    isVisited[trg] = true;
+                    queue.add(trg);
+                    res.append(trg).append(' ');
                 }
             }
         }
 
-        sb.append('\n');
+        res.append('\n');
     }
 
-    public static void main(String[] argu) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        v = Integer.parseInt(st.nextToken());
-        graph = new ArrayList[n + 1];
+    public static void main(String[] args) throws Exception {
+        Reader in = new Reader();
+        StringBuilder sb = new StringBuilder();
+
+        n = in.nextInt();
+        m = in.nextInt();
+        v = in.nextInt();
 
         for (int i = 0; i <= n; i++){
-            graph[i] = new ArrayList<>();
+            edges.add(new ArrayList<>());
         }
 
         for (int i = 0; i < m; i++){
-            st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            graph[a].add(b);
-            graph[b].add(a);
+            int a = in.nextInt();
+            int b = in.nextInt();
+            edges.get(a).add(b);
+            edges.get(b).add(a);
         }
 
-        for (int i = 0; i <= n; i++)
-            graph[i].sort(Comparator.naturalOrder());
+        for (int i = 1; i <= n; i++){
+            edges.get(i).sort(null);
+        }
 
         isVisited = new boolean[n + 1];
+
         dfs(v);
-        sb.append('\n');
-        isVisited = new boolean[n + 1];
-        bfs(v);
+        
+        res.append('\n');
 
-        System.out.println(sb);
+        isVisited = new boolean[n + 1];
+
+        bfs();
+
+        System.out.println(res);
+    }
+}
+
+class Reader {
+    final int SIZE = 1 << 13;
+    byte[] buffer = new byte[SIZE];
+    int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
+    }
+    
+    int nextInt() throws Exception {
+        int n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    long nextLong() throws Exception {
+        long n = 0;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32);
+        if (c == 45) { c = read(); isMinus = true; }
+        do n = (n << 3) + (n << 1) + (c & 15);
+        while (isNumber(c = read()));
+        return isMinus ? ~n + 1 : n;
+    }
+
+    double nextDouble() throws Exception {
+        double n = 0, div = 1;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
+        if (c == 45) { c = read(); isMinus = true; }
+        else if (c == 46) { c = read(); }
+        do n = (n * 10) + (c & 15);
+        while (isNumber(c = read()));
+        if (c == 46) { while (isNumber(c = read())){ n += (c - 48) / (div *= 10); }}
+        return isMinus ? -n : n;
+    }
+
+    boolean isNumber(byte c) {
+        return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
+    }
+
+    byte read() throws Exception {
+        if (index == size) {
+            size = System.in.read(buffer, index = 0, SIZE);
+            if (size < 0) buffer[0] = -1;
+        }
+        return buffer[index++];
     }
 }
