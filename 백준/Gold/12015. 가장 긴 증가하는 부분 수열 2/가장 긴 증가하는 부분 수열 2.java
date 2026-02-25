@@ -1,39 +1,44 @@
-//import java.io.FileInputStream;
+
+
+/**
+ * Written by 0xc0de1dea
+ * Email : 0xc0de1dea@gmail.com
+ */
 
 public class Main {
-    public static int lowerBound(int[] arr, int s, int e, int target){
-        while (s != e){
-            int m = (s + e) / 2;
+    public static void lowerbound(int[] lis, int idx, int num){
+        int l = 1;
+        int r = idx + 1;
 
-            if (arr[m] < target) s = m + 1;
-            else e = m;
+        while (l < r){
+            int m = l + r >> 1;
+
+            if (lis[m] < num) l = m + 1;
+            else r = m;
         }
-        return e;
+
+        lis[l] = num;
     }
 
-    public static void main(String[] argu) throws Exception {
+    public static void main(String[] args) throws Exception {
         Reader in = new Reader();
         StringBuilder sb = new StringBuilder();
-        
-        int n = in.nextInt();
-        int[] sequence = new int[n];
-        int[] lis = new int[n + 1];
-        int len = 0;
 
-        for (int i = 0; i < n; i++){
-            sequence[i] = in.nextInt();
-        }
+        int n = in.nextInt();
+        int[] lis = new int[n + 1];
+        int idx = 0;
         
         for (int i = 0; i < n; i++){
-            if (sequence[i] > lis[len]){
-                lis[++len] = sequence[i];
-            }
-            else {
-                lis[lowerBound(lis, 1, len, sequence[i])] = sequence[i];
+            int num = in.nextInt();
+
+            if (lis[idx] < num){
+                lis[++idx] = num;
+            } else {
+                lowerbound(lis, idx, num);
             }
         }
-        
-        System.out.println(len);
+
+        System.out.println(idx);
     }
 }
 
@@ -41,12 +46,27 @@ class Reader {
     final int SIZE = 1 << 13;
     byte[] buffer = new byte[SIZE];
     int index, size;
+
+    String nextString() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        byte c;
+        while ((c = read()) < 32) { if (size < 0) return "endLine"; }
+        do sb.appendCodePoint(c);
+        while ((c = read()) >= 32); // SPACE 분리라면 >로, 줄당 분리라면 >=로
+        return sb.toString();
+    }
+
+    char nextChar() throws Exception {
+        byte c;
+        while ((c = read()) < 32); // SPACE 분리라면 <=로, SPACE 무시라면 <로
+        return (char)c;
+    }
     
     int nextInt() throws Exception {
         int n = 0;
         byte c;
         boolean isMinus = false;
-        while ((c = read()) <= 32);//{ if (size == -1) return -1; }
+        while ((c = read()) <= 32) { if (size < 0) return -1; }
         if (c == 45) { c = read(); isMinus = true; }
         do n = (n << 3) + (n << 1) + (c & 15);
         while (isNumber(c = read()));
@@ -64,8 +84,25 @@ class Reader {
         return isMinus ? ~n + 1 : n;
     }
 
+    double nextDouble() throws Exception {
+        double n = 0, div = 1;
+        byte c;
+        boolean isMinus = false;
+        while ((c = read()) <= 32) { if (size < 0) return -12345; }
+        if (c == 45) { c = read(); isMinus = true; }
+        else if (c == 46) { c = read(); }
+        do n = (n * 10) + (c & 15);
+        while (isNumber(c = read()));
+        if (c == 46) { while (isNumber(c = read())){ n += (c - 48) / (div *= 10); }}
+        return isMinus ? -n : n;
+    }
+
     boolean isNumber(byte c) {
         return 47 < c && c < 58;
+    }
+
+    boolean isAlphabet(byte c){
+        return (64 < c && c < 91) || (96 < c && c < 123);
     }
 
     byte read() throws Exception {
